@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Code Bot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      min-height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      font-size: 3rem;
+      color: #38bdf8;
+      margin-bottom: 0.5em;
+    }
+    #chatbox {
+      width: 90%;
+      max-width: 800px;
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+      overflow-y: auto;
+      height: 400px;
+      box-sizing: border-box;
+    }
+    .message {
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+    .user {
+      color: #38bdf8;
+    }
+    .bot {
+      color: #facc15;
+    }
+    #inputArea {
+      margin-top: 20px;
+      display: flex;
+      width: 90%;
+      max-width: 800px;
+    }
+    #prompt {
+      flex: 1;
+      padding: 10px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px 0 0 8px;
+      outline: none;
+    }
+    #sendBtn {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background: #38bdf8;
+      border: none;
+      border-radius: 0 8px 8px 0;
+      color: black;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    #sendBtn:hover {
+      background: #0ea5e9;
+    }
+  </style>
+</head>
+<body>
+  <h1>🤖 Code Bot</h1>
+  <div id="chatbox"></div>
+  <div id="inputArea">
+    <input
+      type="text"
+      id="prompt"
+      placeholder="Ask Code Bot anything about coding..."
+      autocomplete="off"
+    />
+    <button id="sendBtn">Send</button>
+  </div>
+
+  <script>
+    const chatbox = document.getElementById('chatbox');
+    const promptInput = document.getElementById('prompt');
+    const sendBtn = document.getElementById('sendBtn');
+
+    async function askCodeBot(prompt) {
+      addMessage('You', prompt, 'user');
+      try {
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer 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'
+          },
+          body: JSON.stringify({
+            model: 'openai/gpt-3.5-turbo',
+            messages: [{ role: 'user', content: prompt }]
+          })
+        });
+
+        const data = await response.json();
+        const botReply = data.choices[0].message.content;
+        addMessage('Code Bot', botReply, 'bot');
+      } catch (error) {
+        addMessage('Code Bot', 'Oops! Something went wrong.', 'bot');
+        console.error(error);
+      }
+    }
+
+    function addMessage(sender, text, type) {
+      const msg = document.createElement('div');
+      msg.className = `message ${type}`;
+      msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
+      chatbox.appendChild(msg);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    sendBtn.addEventListener('click', () => {
+      const prompt = promptInput.value.trim();
+      if (prompt) {
+        askCodeBot(prompt);
+        promptInput.value = '';
+      }
+    });
+
+    promptInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendBtn.click();
+    });
+  </script>
+</body>
+</html>
