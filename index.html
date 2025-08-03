@@ -1,272 +1,513 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en" data-theme="light">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Code Bot — By Liam Wills</title>
-  <style>
-    /* Reset & base */
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: #e0e6f1;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      overflow-x: hidden;
-      animation: bgShift 20s ease infinite;
-    }
-    @keyframes bgShift {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Code Bot - By Liam Wills</title>
+<style>
+  :root {
+    --clr-bg-light: #f5f7fa;
+    --clr-bg-dark: #0f172a;
+    --clr-text-light: #0f172a;
+    --clr-text-dark: #f5f7fa;
+    --clr-primary: #4f46e5;
+    --clr-primary-hover: #4338ca;
+    --clr-premium: gold;
+  }
+  [data-theme="light"] {
+    --clr-bg: var(--clr-bg-light);
+    --clr-text: var(--clr-text-light);
+  }
+  [data-theme="dark"] {
+    --clr-bg: var(--clr-bg-dark);
+    --clr-text: var(--clr-text-dark);
+  }
 
-    header {
-      text-align: center;
-      padding: 2rem 1rem 0;
-      user-select: none;
-    }
-    header h1 {
-      font-size: 3.5rem;
-      margin: 0;
-      color: #61dafb;
-      letter-spacing: 0.15em;
-      text-shadow: 0 0 15px #61dafbaa;
-      animation: fadeInDown 1.2s ease forwards;
-      opacity: 0;
-    }
-    header p.subtitle {
-      margin: 0.5rem 0 1.5rem;
-      font-size: 1.2rem;
-      color: #a0cfffcc;
-      animation: fadeInDown 1.5s ease forwards;
-      opacity: 0;
-    }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--clr-bg);
+    color: var(--clr-text);
+    transition: background 0.3s ease, color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
 
-    @keyframes fadeInDown {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-    }
+  header {
+    background: var(--clr-primary);
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header h1 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+  .header-buttons button {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-left: 0.5rem;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  .header-buttons button:hover {
+    background: white;
+    color: var(--clr-primary);
+  }
 
-    #chatbox {
-      flex-grow: 1;
-      max-width: 800px;
-      width: 90%;
-      background: rgba(255,255,255,0.08);
-      border-radius: 15px;
-      padding: 1.5rem 2rem;
-      margin: 0 auto 1.5rem;
-      overflow-y: auto;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-      backdrop-filter: blur(12px);
-      animation: fadeIn 2s ease forwards;
-      opacity: 0;
-    }
-    @keyframes fadeIn {
-      to {opacity: 1;}
-      from {opacity: 0;}
-    }
+  main {
+    flex: 1;
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
 
-    .message {
-      margin-bottom: 1.1rem;
-      line-height: 1.4;
-      font-size: 1.05rem;
-      padding: 0.6rem 1rem;
-      border-radius: 12px;
-      max-width: 80%;
-      word-wrap: break-word;
-      animation: messagePop 0.3s ease forwards;
-    }
-    @keyframes messagePop {
-      from {
-        opacity: 0;
-        transform: scale(0.95);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
+  #settingsPanel {
+    background: var(--clr-primary-hover);
+    color: white;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  #settingsPanel label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  #settingsPanel select,
+  #settingsPanel input[type="checkbox"] {
+    cursor: pointer;
+  }
 
-    .user {
-      background: #61dafb;
-      color: #0b111a;
-      align-self: flex-end;
-      border-bottom-right-radius: 2px;
-      box-shadow: 0 0 6px #61dafbaa;
-    }
-    .bot {
-      background: #233554;
-      color: #d3e3f7;
-      align-self: flex-start;
-      border-bottom-left-radius: 2px;
-      box-shadow: 0 0 6px #4aa4f8aa;
-    }
+  #chatArea {
+    background: var(--clr-bg-light);
+    background: var(--clr-bg);
+    flex-grow: 1;
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    padding: 1rem;
+    overflow-y: auto;
+    max-height: 400px;
+  }
+  [data-theme="dark"] #chatArea {
+    background: var(--clr-bg-dark);
+  }
 
-    #inputArea {
-      max-width: 800px;
-      width: 90%;
-      margin: 0 auto 2rem;
-      display: flex;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-      border-radius: 50px;
-      background: rgba(255,255,255,0.12);
-      backdrop-filter: blur(10px);
-      overflow: hidden;
-      animation: fadeIn 2.5s ease forwards;
-      opacity: 0;
-    }
-    #prompt {
-      flex: 1;
-      border: none;
-      padding: 1rem 1.5rem;
-      font-size: 1.15rem;
-      color: #f0f7ff;
-      background: transparent;
-      outline: none;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      transition: background-color 0.3s ease;
-    }
-    #prompt::placeholder {
-      color: #a3b9d8aa;
-      font-weight: 400;
-    }
-    #prompt:focus {
-      background: rgba(255,255,255,0.15);
-    }
-    #sendBtn {
-      background: #61dafb;
-      border: none;
-      padding: 0 2.2rem;
-      cursor: pointer;
-      font-weight: 700;
-      color: #0b111a;
-      font-size: 1.3rem;
-      transition: background-color 0.25s ease;
-      user-select: none;
-      border-radius: 0 50px 50px 0;
-      box-shadow: 0 0 10px #61dafbcc;
-    }
-    #sendBtn:hover {
-      background-color: #4fc3f7;
-      box-shadow: 0 0 20px #4fc3f7cc;
-    }
-    #sendBtn:active {
-      transform: scale(0.96);
-    }
+  .message {
+    margin-bottom: 1rem;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    max-width: 80%;
+    white-space: pre-wrap;
+    line-height: 1.4;
+  }
+  .user {
+    background: var(--clr-primary);
+    color: white;
+    align-self: flex-end;
+    animation: slideInRight 0.3s ease forwards;
+  }
+  .bot {
+    background: var(--clr-primary-hover);
+    color: white;
+    align-self: flex-start;
+    animation: slideInLeft 0.3s ease forwards;
+  }
+  @keyframes slideInRight {
+    from {opacity: 0; transform: translateX(50px);}
+    to {opacity: 1; transform: translateX(0);}
+  }
+  @keyframes slideInLeft {
+    from {opacity: 0; transform: translateX(-50px);}
+    to {opacity: 1; transform: translateX(0);}
+  }
 
-    footer {
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.85rem;
-      color: #a0b8d4aa;
-      border-top: 1px solid #2b3a55;
-      user-select: none;
-      font-style: italic;
-      letter-spacing: 0.03em;
-    }
+  .codeblock {
+    background: #222;
+    color: #8af;
+    font-family: monospace;
+    padding: 0.5rem;
+    border-radius: 6px;
+    margin-top: 0.3rem;
+    position: relative;
+  }
+  .copybtn {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    background: var(--clr-primary);
+    border: none;
+    color: white;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+  .copybtn:hover {
+    opacity: 1;
+  }
 
-    footer a {
-      color: #61dafbcc;
-      text-decoration: none;
-      font-weight: 600;
-    }
+  #inputArea {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+  #userInput {
+    flex-grow: 1;
+    padding: 0.7rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  #sendBtn {
+    background: var(--clr-primary);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  #sendBtn:hover {
+    background: var(--clr-primary-hover);
+  }
 
-    footer a:hover {
-      text-decoration: underline;
+  #premiumBanner {
+    background: var(--clr-premium);
+    color: #222;
+    font-weight: 700;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  #loginModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  #loginModal.active {
+    display: flex;
+  }
+  #loginModalContent {
+    background: var(--clr-bg);
+    color: var(--clr-text);
+    padding: 2rem;
+    border-radius: 12px;
+    width: 320px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.25);
+  }
+  #loginModalContent h2 {
+    margin-bottom: 1rem;
+  }
+  #loginModalContent input {
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 0.7rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+  }
+  #loginModalContent button {
+    width: 100%;
+    background: var(--clr-primary);
+    border: none;
+    color: white;
+    padding: 0.8rem;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  #loginModalContent button:hover {
+    background: var(--clr-primary-hover);
+  }
+  #loginModalClose {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--clr-text);
+    cursor: pointer;
+  }
+
+  @media(max-width: 600px) {
+    main {
+      margin: 1rem;
+      padding: 0 0.5rem;
     }
-  </style>
+    #loginModalContent {
+      width: 90vw;
+    }
+  }
+</style>
 </head>
 <body>
-  <header>
-    <h1>🤖 Code Bot</h1>
-    <p class="subtitle">Ask me anything about coding — safe & secure!</p>
-  </header>
+<header>
+  <h1>🤖 Code Bot</h1>
+  <div class="header-buttons">
+    <button id="loginBtn">Login</button>
+    <button id="signupBtn">Sign Up</button>
+    <button id="themeToggleBtn" aria-label="Toggle theme">🌙</button>
+  </div>
+</header>
 
-  <div id="chatbox"></div>
-
-  <div id="inputArea">
-    <input
-      type="text"
-      id="prompt"
-      placeholder="Type your coding question here..."
-      autocomplete="off"
-      spellcheck="false"
-      aria-label="Message input"
-    />
-    <button id="sendBtn" aria-label="Send message">Send</button>
+<main>
+  <div id="premiumBanner" style="display:none;">
+    🚀 You have Premium Access! Enjoy advanced features.
   </div>
 
-  <footer>
-    By <strong>Liam Wills</strong> &mdash; All your coding questions answered.<br />
-    <small>Uses OpenRouter AI API — your data is <em>safe</em> and <em>not stored</em> by Code Bot.</small>
-  </footer>
+  <button id="toggleSettingsBtn" style="margin-bottom:1rem;">⚙️ Settings</button>
+  <div id="settingsPanel" aria-label="Settings Panel">
+    <label>
+      <input type="checkbox" id="advancedModeCheckbox" />
+      Enable Advanced Mode
+    </label>
+    <label>
+      <input type="checkbox" id="saveHistoryCheckbox" />
+      Save Chat History
+    </label>
+    <label>
+      <input type="checkbox" id="compactLayoutCheckbox" />
+      Compact Layout
+    </label>
+  </div>
 
-  <script>
-    const chatbox = document.getElementById('chatbox');
-    const promptInput = document.getElementById('prompt');
-    const sendBtn = document.getElementById('sendBtn');
+  <div id="chatArea" role="log" aria-live="polite" aria-atomic="false"></div>
 
-    function addMessage(sender, text, type) {
-      const msg = document.createElement('div');
-      msg.className = `message ${type}`;
-      msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
-      chatbox.appendChild(msg);
-      chatbox.scrollTop = chatbox.scrollHeight;
-    }
+  <div id="inputArea">
+    <textarea id="userInput" placeholder="Ask me anything about coding..." rows="3" aria-label="User input"></textarea>
+    <button id="sendBtn">Send</button>
+  </div>
+</main>
 
-    async function askCodeBot(prompt) {
-      addMessage('You', prompt, 'user');
-      try {
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer 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'
-          },
-          body: JSON.stringify({
-            model: 'openai/gpt-3.5-turbo',
-            messages: [{ role: 'user', content: prompt }]
-          })
+<footer>
+  By Liam Wills © 2025
+</footer>
+
+<!-- Login Modal -->
+<div id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div id="loginModalContent">
+    <button id="loginModalClose" aria-label="Close modal">&times;</button>
+    <h2 id="loginTitle">Login / Sign Up</h2>
+    <input type="email" id="emailInput" placeholder="Email" autocomplete="username" required />
+    <input type="password" id="passwordInput" placeholder="Password" autocomplete="current-password" required />
+    <button id="submitLoginBtn">Submit</button>
+  </div>
+</div>
+
+<script>
+  // --- Theme ---
+  const body = document.body;
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  const premiumBanner = document.getElementById('premiumBanner');
+  const settingsPanel = document.getElementById('settingsPanel');
+  const toggleSettingsBtn = document.getElementById('toggleSettingsBtn');
+  const loginModal = document.getElementById('loginModal');
+  const loginBtn = document.getElementById('loginBtn');
+  const signupBtn = document.getElementById('signupBtn');
+  const loginModalClose = document.getElementById('loginModalClose');
+  const submitLoginBtn = document.getElementById('submitLoginBtn');
+
+  let isPremium = false;
+  let advancedMode = false;
+  let saveHistory = false;
+  let compactLayout = false;
+
+  // Load saved settings & theme
+  function loadSettings() {
+    const theme = localStorage.getItem('theme') || 'light';
+    body.setAttribute('data-theme', theme);
+    themeToggleBtn.textContent = theme === 'dark' ? '🌞' : '🌙';
+
+    isPremium = localStorage.getItem('isPremium') === 'true';
+    updatePremiumBanner();
+
+    advancedMode = localStorage.getItem('advancedMode') === 'true';
+    saveHistory = localStorage.getItem('saveHistory') === 'true';
+    compactLayout = localStorage.getItem('compactLayout') === 'true';
+
+    document.getElementById('advancedModeCheckbox').checked = advancedMode;
+    document.getElementById('saveHistoryCheckbox').checked = saveHistory;
+    document.getElementById('compactLayoutCheckbox').checked = compactLayout;
+  }
+
+  function updatePremiumBanner() {
+    premiumBanner.style.display = isPremium ? 'block' : 'none';
+  }
+
+  themeToggleBtn.onclick = () => {
+    const currentTheme = body.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    themeToggleBtn.textContent = newTheme === 'dark' ? '🌞' : '🌙';
+  };
+
+  toggleSettingsBtn.onclick = () => {
+    settingsPanel.style.display = settingsPanel.style.display === 'flex' ? 'none' : 'flex';
+  };
+
+  // --- Chat ---
+  const chatArea = document.getElementById('chatArea');
+  const userInput = document.getElementById('userInput');
+  const sendBtn = document.getElementById('sendBtn');
+
+  sendBtn.onclick = () => {
+    const msg = userInput.value.trim();
+    if (!msg) return;
+    addMessage(msg, 'user');
+    userInput.value = '';
+
+    // Fake AI reply after delay
+    setTimeout(() => {
+      addMessage(generateBotReply(msg), 'bot');
+    }, 1000);
+  };
+
+  function addMessage(text, sender) {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('message', sender);
+    if (sender === 'bot' && text.startsWith('```')) {
+      // Extract code block
+      const codeText = text.replace(/```/g, '');
+      msgDiv.innerHTML = `<pre class="codeblock" tabindex="0">${escapeHtml(codeText)}<button class="copybtn" title="Copy code">Copy</button></pre>`;
+      // Copy button event
+      msgDiv.querySelector('.copybtn').onclick = e => {
+        const code = e.target.previousSibling.textContent;
+        navigator.clipboard.writeText(code).then(() => {
+          e.target.textContent = 'Copied!';
+          setTimeout(() => e.target.textContent = 'Copy', 2000);
         });
+      };
+    } else {
+      msgDiv.textContent = text;
+    }
+    chatArea.appendChild(msgDiv);
+    chatArea.scrollTop = chatArea.scrollHeight;
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+    // Save chat if enabled
+    if (saveHistory) saveChatHistory();
+  }
 
-        const data = await response.json();
-        const botReply = data.choices[0].message.content;
-        addMessage('Code Bot', botReply, 'bot');
-      } catch (error) {
-        addMessage('Code Bot', 'Oops! Something went wrong. Try again later.', 'bot');
-        console.error(error);
+  function generateBotReply(userText) {
+    // Very simple mock AI logic
+    if (/code|function|js|javascript/.test(userText.toLowerCase())) {
+      if (isPremium && advancedMode) {
+        return "```javascript\nfunction greet() {\n  console.log('Hello from Code Bot Premium!');\n}\ngreet();\n```";
+      } else {
+        return "```javascript\nconsole.log('Hello from Code Bot!');\n```";
       }
     }
+    return "I am Code Bot! Ask me about coding or say 'show me code'.";
+  }
 
-    sendBtn.addEventListener('click', () => {
-      const prompt = promptInput.value.trim();
-      if (prompt) {
-        askCodeBot(prompt);
-        promptInput.value = '';
-      }
-    });
+  // --- Save / Load Chat History ---
+  function saveChatHistory() {
+    const messages = Array.from(chatArea.querySelectorAll('.message')).map(m => ({
+      sender: m.classList.contains('user') ? 'user' : 'bot',
+      text: m.classList.contains('bot') && m.querySelector('pre') ? m.querySelector('pre').textContent : m.textContent,
+    }));
+    localStorage.setItem('chatHistory', JSON.stringify(messages));
+  }
 
-    promptInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendBtn.click();
+  function loadChatHistory() {
+    if (!saveHistory) return;
+    const messages = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+    messages.forEach(({sender, text}) => addMessage(text, sender));
+  }
+
+  // --- Escape HTML for code blocks ---
+  function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, (m) => {
+      return {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[m];
     });
-  </script>
+  }
+
+  // --- Login Modal ---
+  loginBtn.onclick = () => showLoginModal();
+  signupBtn.onclick = () => showLoginModal(true);
+  loginModalClose.onclick = () => hideLoginModal();
+
+  function showLoginModal(signup = false) {
+    loginModal.classList.add('active');
+    document.getElementById('loginTitle').textContent = signup ? 'Sign Up' : 'Login';
+    submitLoginBtn.textContent = signup ? 'Sign Up' : 'Login';
+  }
+  function hideLoginModal() {
+    loginModal.classList.remove('active');
+  }
+
+  submitLoginBtn.onclick = () => {
+    const email = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('passwordInput').value.trim();
+    if (!email || !password) {
+      alert('Please enter email and password.');
+      return;
+    }
+
+    // Fake auth (store premium if email includes 'premium')
+    if (email.toLowerCase().includes('premium')) {
+      isPremium = true;
+      alert('Welcome Premium User!');
+    } else {
+      isPremium = false;
+      alert('Welcome Free User!');
+    }
+    localStorage.setItem('isPremium', isPremium);
+    updatePremiumBanner();
+    hideLoginModal();
+  };
+
+  // --- Settings checkboxes ---
+  document.getElementById('advancedModeCheckbox').onchange = e => {
+    advancedMode = e.target.checked;
+    localStorage.setItem('advancedMode', advancedMode);
+  };
+  document.getElementById('saveHistoryCheckbox').onchange = e => {
+    saveHistory = e.target.checked;
+    localStorage.setItem('saveHistory', saveHistory);
+    if (saveHistory) loadChatHistory();
+    else localStorage.removeItem('chatHistory');
+  };
+  document.getElementById('compactLayoutCheckbox').onchange = e => {
+    compactLayout = e.target.checked;
+    localStorage.setItem('compactLayout', compactLayout);
+    // Could add compact styles here if you want
+  };
+
+  // --- Initialize ---
+  loadSettings();
+  if (saveHistory) loadChatHistory();
+</script>
 </body>
 </html>
-<!-- force update -->
