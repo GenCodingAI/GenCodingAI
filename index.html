@@ -1,1 +1,356 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Code Bot</title><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet"><style>*{margin:0;padding:0;box-sizing:border-box;font-family:'Orbitron',sans-serif;}body{background:#010a13;color:#0ff;overflow-x:hidden;transition:background 0.5s,color 0.5s;}header{padding:20px;text-align:center;background:#01101e;box-shadow:0 0 10px #00f4ff;}header h1{font-size:2.5em;text-shadow:0 0 15px #00f4ff;}nav{display:flex;justify-content:center;gap:20px;margin-top:10px;}nav a{color:#0ff;text-decoration:none;font-weight:bold;transition:0.3s;}nav a:hover{color:white;text-shadow:0 0 10px #0ff;}#modeToggle{position:absolute;top:20px;right:20px;padding:10px 20px;border:none;background:#00f4ff;color:#000;font-weight:bold;border-radius:5px;cursor:pointer;box-shadow:0 0 10px #00f4ff;}main{padding:40px;text-align:center;}section{margin:60px auto;width:90%;max-width:800px;padding:20px;background:rgba(0,0,0,0.2);box-shadow:0 0 20px #00f4ff;border-radius:12px;}section h2{font-size:2em;margin-bottom:20px;text-shadow:0 0 10px #0ff;}textarea{width:100%;height:180px;margin:20px 0;padding:10px;font-size:1em;background:#011826;color:#0ff;border:1px solid #0ff;border-radius:8px;box-shadow:0 0 10px #0ff;resize:none;}button{padding:12px 25px;background:#00f4ff;color:#000;font-weight:bold;border:none;border-radius:8px;cursor:pointer;transition:0.3s;box-shadow:0 0 10px #00f4ff;}button:hover{transform:scale(1.05);box-shadow:0 0 20px #00f4ff;}footer{text-align:center;padding:30px;background:#01101e;color:#0ff;margin-top:60px;}#login,#signup,#premium{display:none;}</style></head><body><header><h1>💻 Code Bot</h1><nav><a href="#chat">Chat</a><a href="#premium">Premium</a><a href="#login">Login</a><a href="#signup">Sign Up</a></nav><button id="modeToggle">Light Mode</button></header><main><section id="chat"><h2>Ask Code Bot</h2><textarea id="question" placeholder="Ask me any coding question..."></textarea><button onclick="respond()">Submit</button><textarea id="answer" readonly placeholder="Code Bot will answer here..."></textarea></section><section id="premium"><h2>💎 Premium Features</h2><ul style="text-align:left;list-style:circle;margin-left:20px;"><li>Unlock advanced logic responses</li><li>Use GPT-powered code generation</li><li>Access to downloadable code packs</li><li>One-on-one support for errors</li><li>More themes and interface tools</li></ul><br><button onclick="alert('Coming soon!')">Upgrade Now</button></section><section id="login"><h2>🔐 Login</h2><input type="text" placeholder="Email" style="margin:10px;padding:10px;width:80%;"><input type="password" placeholder="Password" style="margin:10px;padding:10px;width:80%;"><br><button onclick="alert('Login logic coming soon')">Login with Google</button></section><section id="signup"><h2>📝 Sign Up</h2><input type="text" placeholder="Email" style="margin:10px;padding:10px;width:80%;"><input type="password" placeholder="Password" style="margin:10px;padding:10px;width:80%;"><br><button onclick="alert('Signup logic coming soon')">Sign Up</button></section></main><footer>&copy; 2025 Code Bot by GlizzyGuy09</footer><script>const modeBtn=document.getElementById("modeToggle");let darkMode=true;modeBtn.onclick=()=>{darkMode=!darkMode;if(darkMode){document.body.style.background="#010a13";document.body.style.color="#0ff";modeBtn.textContent="Light Mode";}else{document.body.style.background="#f4f4f4";document.body.style.color="#111";modeBtn.textContent="Dark Mode";}}function respond(){const q=document.getElementById("question").value.toLowerCase();const a=document.getElementById("answer");if(q.includes("html")){a.value="HTML is used to structure your webpage. Example:\n<html><head><title>My Page</title></head><body>Hello!</body></html>";}else if(q.includes("css")){a.value="CSS controls how things look. Example:\nbody { color: blue; }";}else if(q.includes("javascript")){a.value="JavaScript adds logic. Example:\ndocument.querySelector('button').onclick = () => alert('Hello!');";}else{a.value="I’m still learning! More logic coming soon...";}}</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Code Bot</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet" />
+<style>
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+    font-family: 'Orbitron', sans-serif;
+  }
+  body {
+    background: #010a13;
+    color: #0ff;
+    overflow-x: hidden;
+    transition: background 0.5s, color 0.5s;
+  }
+  header {
+    padding: 20px;
+    text-align: center;
+    background: #01101e;
+    box-shadow: 0 0 10px #00f4ff;
+    position: relative;
+  }
+  header h1 {
+    font-size: 2.5em;
+    text-shadow: 0 0 15px #00f4ff;
+  }
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 10px;
+  }
+  nav a {
+    color: #0ff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+  }
+  nav a:hover {
+    color: white;
+    text-shadow: 0 0 10px #0ff;
+  }
+  #modeToggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    border: none;
+    background: #00f4ff;
+    color: #000;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 0 10px #00f4ff;
+  }
+  main {
+    padding: 40px;
+    text-align: center;
+  }
+  section {
+    margin: 60px auto;
+    width: 90%;
+    max-width: 800px;
+    padding: 20px;
+    background: rgba(0,0,0,0.2);
+    box-shadow: 0 0 20px #00f4ff;
+    border-radius: 12px;
+    display: none; /* all sections hidden initially */
+  }
+  section.active {
+    display: block;
+  }
+  section h2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px #0ff;
+  }
+  textarea {
+    width: 100%;
+    height: 180px;
+    margin: 20px 0;
+    padding: 10px;
+    font-size: 1em;
+    background: #011826;
+    color: #0ff;
+    border: 1px solid #0ff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px #0ff;
+    resize: none;
+  }
+  input[type=text], input[type=password] {
+    width: 80%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #0ff;
+    background: #011826;
+    color: #0ff;
+    box-shadow: 0 0 10px #0ff;
+    outline: none;
+    font-size: 1em;
+  }
+  button {
+    padding: 12px 25px;
+    background: #00f4ff;
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 0 10px #00f4ff;
+  }
+  button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #00f4ff;
+  }
+  footer {
+    text-align: center;
+    padding: 30px;
+    background: #01101e;
+    color: #0ff;
+    margin-top: 60px;
+  }
+  .error {
+    color: #f00;
+    margin-top: 10px;
+    font-weight: bold;
+    text-shadow: none;
+  }
+  /* Scroll for chat answer */
+  #answer {
+    overflow-y: auto;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>💻 Code Bot</h1>
+  <nav>
+    <a href="#" data-section="chat">Chat</a>
+    <a href="#" data-section="premium">Premium</a>
+    <a href="#" data-section="login">Login</a>
+    <a href="#" data-section="signup">Sign Up</a>
+  </nav>
+  <button id="modeToggle">Light Mode</button>
+</header>
+
+<main>
+  <section id="chat" class="active">
+    <h2>Ask Code Bot</h2>
+    <textarea id="question" placeholder="Ask me any coding question..."></textarea>
+    <button id="submitQuestion">Submit</button>
+    <textarea id="answer" readonly placeholder="Code Bot will answer here..."></textarea>
+  </section>
+
+  <section id="premium">
+    <h2>💎 Premium Features</h2>
+    <ul style="text-align:left; list-style:circle; margin-left:20px;">
+      <li>Unlock advanced logic responses</li>
+      <li>Use GPT-powered code generation</li>
+      <li>Access to downloadable code packs</li>
+      <li>One-on-one support for errors</li>
+      <li>More themes and interface tools</li>
+    </ul>
+    <br />
+    <button id="upgradeBtn">Upgrade Now</button>
+    <p id="premiumStatus" style="margin-top:20px; font-weight:bold;"></p>
+  </section>
+
+  <section id="login">
+    <h2>🔐 Login</h2>
+    <input type="text" id="loginEmail" placeholder="Email" />
+    <input type="password" id="loginPassword" placeholder="Password" />
+    <br />
+    <button id="loginBtn">Login with Google</button>
+    <p class="error" id="loginError"></p>
+  </section>
+
+  <section id="signup">
+    <h2>📝 Sign Up</h2>
+    <input type="text" id="signupEmail" placeholder="Email" />
+    <input type="password" id="signupPassword" placeholder="Password" />
+    <br />
+    <button id="signupBtn">Sign Up</button>
+    <p class="error" id="signupError"></p>
+  </section>
+</main>
+
+<footer>
+  &copy; 2025 Code Bot by GlizzyGuy09
+</footer>
+
+<script>
+  // Navigation between sections
+  const navLinks = document.querySelectorAll("nav a");
+  const sections = document.querySelectorAll("main section");
+
+  navLinks.forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const target = link.getAttribute("data-section");
+      sections.forEach(s => {
+        if (s.id === target) {
+          s.classList.add("active");
+        } else {
+          s.classList.remove("active");
+        }
+      });
+    });
+  });
+
+  // Dark/Light mode toggle
+  const modeToggle = document.getElementById("modeToggle");
+  let darkMode = true;
+  modeToggle.addEventListener("click", () => {
+    darkMode = !darkMode;
+    if (darkMode) {
+      document.body.style.background = "#010a13";
+      document.body.style.color = "#0ff";
+      modeToggle.textContent = "Light Mode";
+    } else {
+      document.body.style.background = "#f4f4f4";
+      document.body.style.color = "#111";
+      modeToggle.textContent = "Dark Mode";
+    }
+  });
+
+  // Simple "database" for users and premium status (in memory)
+  const users = {};
+  let loggedInUser = null;
+  let isPremium = false;
+
+  // Login logic (simulated)
+  const loginBtn = document.getElementById("loginBtn");
+  const loginEmail = document.getElementById("loginEmail");
+  const loginPassword = document.getElementById("loginPassword");
+  const loginError = document.getElementById("loginError");
+
+  loginBtn.addEventListener("click", () => {
+    loginError.textContent = "";
+    const email = loginEmail.value.trim();
+    const password = loginPassword.value.trim();
+    if (!email || !password) {
+      loginError.textContent = "Please enter both email and password.";
+      return;
+    }
+    if (users[email] && users[email].password === password) {
+      loggedInUser = email;
+      isPremium = users[email].premium || false;
+      alert(`Welcome back, ${email}!`);
+      switchToSection("chat");
+      updatePremiumStatus();
+    } else {
+      loginError.textContent = "Invalid email or password.";
+    }
+  });
+
+  // Signup logic (simulated)
+  const signupBtn = document.getElementById("signupBtn");
+  const signupEmail = document.getElementById("signupEmail");
+  const signupPassword = document.getElementById("signupPassword");
+  const signupError = document.getElementById("signupError");
+
+  signupBtn.addEventListener("click", () => {
+    signupError.textContent = "";
+    const email = signupEmail.value.trim();
+    const password = signupPassword.value.trim();
+    if (!email || !password) {
+      signupError.textContent = "Please enter both email and password.";
+      return;
+    }
+    if (users[email]) {
+      signupError.textContent = "Email already registered.";
+      return;
+    }
+    users[email] = { password: password, premium: false };
+    alert(`Account created for ${email}! Please log in.`);
+    switchToSection("login");
+  });
+
+  // Upgrade to premium (simulated)
+  const upgradeBtn = document.getElementById("upgradeBtn");
+  const premiumStatus = document.getElementById("premiumStatus");
+
+  upgradeBtn.addEventListener("click", () => {
+    if (!loggedInUser) {
+      alert("You must be logged in to upgrade.");
+      switchToSection("login");
+      return;
+    }
+    if (isPremium) {
+      alert("You already have premium!");
+      return;
+    }
+    // Simulate payment success
+    users[loggedInUser].premium = true;
+    isPremium = true;
+    alert("Thank you for upgrading to Premium!");
+    updatePremiumStatus();
+  });
+
+  function updatePremiumStatus() {
+    premiumStatus.textContent = isPremium ? "⭐ You have Premium access." : "You don't have Premium yet.";
+  }
+
+  // Chat bot logic with basic keyword matching
+  const submitBtn = document.getElementById("submitQuestion");
+  const questionInput = document.getElementById("question");
+  const answerOutput = document.getElementById("answer");
+
+  submitBtn.addEventListener("click", () => {
+    const q = questionInput.value.trim().toLowerCase();
+    if (!q) {
+      answerOutput.value = "Please enter a question.";
+      return;
+    }
+
+    // Basic answers for free users
+    let response = "I'm still learning! Try asking about HTML, CSS, or JavaScript.";
+
+    if (q.includes("html")) {
+      response = "HTML is the structure of webpages. Example:\n<html><head><title>Page</title></head><body>Hello!</body></html>";
+    } else if (q.includes("css")) {
+      response = "CSS styles your page. Example:\nbody { background: black; color: white; }";
+    } else if (q.includes("javascript")) {
+      response = "JavaScript adds interactivity. Example:\ndocument.querySelector('button').onclick = () => alert('Hello!');";
+    }
+
+    // If premium, add more advanced answers
+    if (isPremium) {
+      if (q.includes("api")) {
+        response = "APIs let different software communicate. Example: fetch('https://api.example.com').then(res => res.json())";
+      } else if (q.includes("react")) {
+        response = "React is a JavaScript library for building user interfaces. Example: function App() { return <div>Hello</div>; }";
+      } else if (q.includes("node")) {
+        response = "Node.js lets you run JavaScript on the server. Example: const http = require('http');";
+      }
+    }
+
+    answerOutput.value = response;
+  });
+
+  // Helper function to switch visible section
+  function switchToSection(id) {
+    sections.forEach(s => {
+      s.classList.toggle("active", s.id === id);
+    });
+  }
+</script>
+</body>
+</html>
