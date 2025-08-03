@@ -67,6 +67,9 @@
   #userStatus {
     margin: 10px 0; font-weight: bold; color: #0f0;
   }
+  #logoutLink {
+    color: #f00; cursor: pointer; font-weight: bold; display: none;
+  }
 </style>
 </head>
 <body>
@@ -78,7 +81,7 @@
     <a href="#premium">Premium</a>
     <a href="#login">Login</a>
     <a href="#signup">Sign Up</a>
-    <a href="#" id="logoutLink" style="display:none;color:#f00;">Logout</a>
+    <a id="logoutLink">Logout</a>
   </nav>
   <button id="modeToggle">Light Mode</button>
 </header>
@@ -127,7 +130,9 @@
 
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
 <script>
+  // Your Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyDsWqMO9cbFeHrLMVhYiPrIqpfk-5aeCT8",
     authDomain: "code-bot-519.firebaseapp.com",
@@ -142,22 +147,19 @@
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
 
-  // Login UI elements
+  // UI elements
   const loginEmail = document.getElementById('loginEmail');
   const loginPassword = document.getElementById('loginPassword');
   const loginBtn = document.getElementById('loginBtn');
   const loginStatus = document.getElementById('loginStatus');
 
-  // Signup UI elements
   const signupEmail = document.getElementById('signupEmail');
   const signupPassword = document.getElementById('signupPassword');
   const signupBtn = document.getElementById('signupBtn');
   const signupStatus = document.getElementById('signupStatus');
 
-  // Logout link
   const logoutLink = document.getElementById('logoutLink');
 
-  // Google sign in button
   const googleSignInBtn = document.getElementById('googleSignInBtn');
 
   // Dark/Light mode toggle
@@ -176,7 +178,7 @@
     }
   };
 
-  // Sign up logic
+  // Signup logic
   signupBtn.onclick = () => {
     signupStatus.textContent = 'Signing up...';
     auth.createUserWithEmailAndPassword(signupEmail.value, signupPassword.value)
@@ -242,12 +244,13 @@
   function respond() {
     const q = document.getElementById('question').value.toLowerCase();
     const a = document.getElementById('answer');
-    if (q.includes('html')) {
-      a.value = `HTML structures your webpage. Example:\n<html>\n  <head><title>Page</title></head>\n  <body>Hello!</body>\n</html>`;
-    } else if (q.includes('css')) {
-      a.value = `CSS controls style. Example:\nbody { color: blue; }`;
-    } else if (q.includes('javascript')) {
-      a.value = `JavaScript adds logic. Example:\ndocument.querySelector('button').onclick = () => alert('Hello!');`;
+
+    if (q.includes("html")) {
+      a.value = "HTML is used to structure your webpage. Example:\n<html><head><title>My Page</title></head><body>Hello!</body></html>";
+    } else if (q.includes("css")) {
+      a.value = "CSS controls how things look. Example:\nbody { color: blue; }";
+    } else if (q.includes("javascript")) {
+      a.value = "JavaScript adds logic. Example:\ndocument.querySelector('button').onclick = () => alert('Hello!');";
     } else {
       a.value = "I’m still learning! More logic coming soon...";
     }
