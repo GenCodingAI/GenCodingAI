@@ -1,261 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Code Bot</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet" />
-<style>
-  * {
-    margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', sans-serif;
-  }
-  body {
-    background: #010a13; color: #0ff; overflow-x: hidden; transition: background 0.5s, color 0.5s;
-  }
-  header {
-    padding: 20px; text-align: center; background: #01101e; box-shadow: 0 0 10px #00f4ff;
-    position: relative;
-  }
-  header h1 {
-    font-size: 2.5em; text-shadow: 0 0 15px #00f4ff;
-  }
-  nav {
-    display: flex; justify-content: center; gap: 20px; margin-top: 10px;
-  }
-  nav a {
-    color: #0ff; text-decoration: none; font-weight: bold; transition: 0.3s;
-  }
-  nav a:hover {
-    color: white; text-shadow: 0 0 10px #0ff;
-  }
-  #modeToggle {
-    position: absolute; top: 20px; right: 20px; padding: 10px 20px; border: none;
-    background: #00f4ff; color: #000; font-weight: bold; border-radius: 5px; cursor: pointer;
-    box-shadow: 0 0 10px #00f4ff;
-  }
-  main {
-    padding: 40px; text-align: center;
-  }
-  section {
-    margin: 60px auto; width: 90%; max-width: 800px; padding: 20px;
-    background: rgba(0,0,0,0.2); box-shadow: 0 0 20px #00f4ff; border-radius: 12px;
-  }
-  section h2 {
-    font-size: 2em; margin-bottom: 20px; text-shadow: 0 0 10px #0ff;
-  }
-  textarea, input[type="text"], input[type="password"] {
-    width: 100%; margin: 10px 0; padding: 10px; font-size: 1em;
-    background: #011826; color: #0ff; border: 1px solid #0ff; border-radius: 8px;
-    box-shadow: 0 0 10px #0ff; resize: none;
-  }
-  button {
-    padding: 12px 25px; background: #00f4ff; color: #000; font-weight: bold; border: none;
-    border-radius: 8px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 10px #00f4ff;
-  }
-  button:hover {
-    transform: scale(1.05); box-shadow: 0 0 20px #00f4ff;
-  }
-  footer {
-    text-align: center; padding: 30px; background: #01101e; color: #0ff; margin-top: 60px;
-  }
-  #premium {
-    text-align: left;
-  }
-  #login, #signup {
-    max-width: 400px; margin: auto;
-  }
-  #userStatus {
-    margin: 10px 0; font-weight: bold; color: #0f0;
-  }
-  #logoutLink {
-    color: #f00; cursor: pointer; font-weight: bold; display: none;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code Bot</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
+    }
+    header {
+      background: #111;
+      color: white;
+      padding: 1em;
+      text-align: center;
+    }
+    nav {
+      display: flex;
+      background: #222;
+      justify-content: center;
+    }
+    nav button {
+      background: none;
+      border: none;
+      color: white;
+      padding: 1em;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    nav button:hover, nav .active {
+      background: #444;
+    }
+    section {
+      display: none;
+      padding: 2em;
+    }
+    section.active {
+      display: block;
+    }
+    .login-area {
+      text-align: center;
+      margin-top: 2em;
+    }
+    #login-btn, #logout-btn {
+      background: #4285F4;
+      color: white;
+      padding: 0.5em 1.5em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    #logout-btn {
+      background: #DB4437;
+    }
+    .user-info {
+      text-align: center;
+      margin-top: 1em;
+      font-size: 18px;
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <h1>💻 Code Bot</h1>
+  <header>
+    <h1>Code Bot</h1>
+  </header>
+
   <nav>
-    <a href="#chat">Chat</a>
-    <a href="#premium">Premium</a>
-    <a href="#login">Login</a>
-    <a href="#signup">Sign Up</a>
-    <a id="logoutLink">Logout</a>
+    <button class="tab-button active" onclick="switchTab('home')">Home</button>
+    <button class="tab-button" onclick="switchTab('about')">About</button>
+    <button class="tab-button" onclick="switchTab('features')">Features</button>
+    <button class="tab-button" onclick="switchTab('contact')">Contact</button>
   </nav>
-  <button id="modeToggle">Light Mode</button>
-</header>
 
-<main>
+  <div class="login-area">
+    <button id="login-btn" onclick="signInWithGoogle()">Sign in with Google</button>
+    <button id="logout-btn" onclick="logout()" style="display:none;">Logout</button>
+  </div>
+  <div class="user-info" id="user-info"></div>
 
-<section id="chat">
-  <h2>Ask Code Bot</h2>
-  <textarea id="question" placeholder="Ask me any coding question..."></textarea>
-  <button onclick="respond()">Submit</button>
-  <textarea id="answer" readonly placeholder="Code Bot will answer here..."></textarea>
-</section>
+  <section id="home" class="active">
+    <h2>Welcome to Code Bot</h2>
+    <p>This is your smart Roblox AI coding assistant. Explore the tabs to learn more.</p>
+  </section>
 
-<section id="premium">
-  <h2>💎 Premium Features</h2>
-  <ul>
-    <li>Unlock advanced logic responses</li>
-    <li>Use GPT-powered code generation</li>
-    <li>Access to downloadable code packs</li>
-    <li>One-on-one support for errors</li>
-    <li>More themes and interface tools</li>
-  </ul>
-  <button onclick="alert('Coming soon!')">Upgrade Now</button>
-</section>
+  <section id="about">
+    <h2>About</h2>
+    <p>Code Bot is designed to help Roblox developers with AI-powered code generation and guidance.</p>
+  </section>
 
-<section id="login">
-  <h2>🔐 Login</h2>
-  <input id="loginEmail" type="text" placeholder="Email" />
-  <input id="loginPassword" type="password" placeholder="Password" />
-  <button id="loginBtn">Login</button>
-  <button id="googleSignInBtn">Sign in with Google</button>
-  <p id="loginStatus"></p>
-</section>
+  <section id="features">
+    <h2>Features</h2>
+    <ul>
+      <li>Smart Roblox code help</li>
+      <li>AI chat for instant support</li>
+      <li>Gamepass GUI & scripts</li>
+    </ul>
+  </section>
 
-<section id="signup">
-  <h2>📝 Sign Up</h2>
-  <input id="signupEmail" type="text" placeholder="Email" />
-  <input id="signupPassword" type="password" placeholder="Password" />
-  <button id="signupBtn">Sign Up</button>
-  <p id="signupStatus"></p>
-</section>
+  <section id="contact">
+    <h2>Contact</h2>
+    <p>Reach out at: <a href="mailto:skullies09@gmail.com">skullies09@gmail.com</a></p>
+  </section>
 
-</main>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDsWqMO9cbFeHrLMVhYiPrIqpfk-5aeCT8",
+      authDomain: "code-bot-519.firebaseapp.com",
+      projectId: "code-bot-519",
+      storageBucket: "code-bot-519.appspot.com",
+      messagingSenderId: "472534217982",
+      appId: "1:472534217982:web:738758b6bee685a70fe1af",
+      measurementId: "G-MMQNGLMB3G"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
-<footer>&copy; 2025 Code Bot by Liam Wills</footer>
-
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-
-<script>
-  // Your Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyDsWqMO9cbFeHrLMVhYiPrIqpfk-5aeCT8",
-    authDomain: "code-bot-519.firebaseapp.com",
-    projectId: "code-bot-519",
-    storageBucket: "code-bot-519.appspot.com",
-    messagingSenderId: "472534217982",
-    appId: "1:472534217982:web:738758b6bee685a70fe1af",
-    measurementId: "G-MMQNGLMB3G"
-  };
-
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-
-  // UI elements
-  const loginEmail = document.getElementById('loginEmail');
-  const loginPassword = document.getElementById('loginPassword');
-  const loginBtn = document.getElementById('loginBtn');
-  const loginStatus = document.getElementById('loginStatus');
-
-  const signupEmail = document.getElementById('signupEmail');
-  const signupPassword = document.getElementById('signupPassword');
-  const signupBtn = document.getElementById('signupBtn');
-  const signupStatus = document.getElementById('signupStatus');
-
-  const logoutLink = document.getElementById('logoutLink');
-
-  const googleSignInBtn = document.getElementById('googleSignInBtn');
-
-  // Dark/Light mode toggle
-  const modeToggle = document.getElementById('modeToggle');
-  let darkMode = true;
-  modeToggle.onclick = () => {
-    darkMode = !darkMode;
-    if (darkMode) {
-      document.body.style.background = '#010a13';
-      document.body.style.color = '#0ff';
-      modeToggle.textContent = 'Light Mode';
-    } else {
-      document.body.style.background = '#f4f4f4';
-      document.body.style.color = '#111';
-      modeToggle.textContent = 'Dark Mode';
-    }
-  };
-
-  // Signup logic
-  signupBtn.onclick = () => {
-    signupStatus.textContent = 'Signing up...';
-    auth.createUserWithEmailAndPassword(signupEmail.value, signupPassword.value)
-      .then(userCredential => {
-        signupStatus.style.color = '#0f0';
-        signupStatus.textContent = 'Sign up successful! You can now login.';
-      })
-      .catch(error => {
-        signupStatus.style.color = '#f00';
-        signupStatus.textContent = error.message;
+    function signInWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).then((result) => {
+        document.getElementById("login-btn").style.display = "none";
+        document.getElementById("logout-btn").style.display = "inline-block";
+        document.getElementById("user-info").innerText = `Welcome, ${result.user.displayName}`;
       });
-  };
-
-  // Login logic
-  loginBtn.onclick = () => {
-    loginStatus.textContent = 'Logging in...';
-    auth.signInWithEmailAndPassword(loginEmail.value, loginPassword.value)
-      .then(userCredential => {
-        loginStatus.style.color = '#0f0';
-        loginStatus.textContent = `Welcome back, ${userCredential.user.email}`;
-      })
-      .catch(error => {
-        loginStatus.style.color = '#f00';
-        loginStatus.textContent = error.message;
-      });
-  };
-
-  // Google sign in logic
-  googleSignInBtn.onclick = () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider)
-      .then(result => {
-        loginStatus.style.color = '#0f0';
-        loginStatus.textContent = `Hello, ${result.user.displayName}! You are signed in with Google.`;
-      })
-      .catch(error => {
-        loginStatus.style.color = '#f00';
-        loginStatus.textContent = error.message;
-      });
-  };
-
-  // Monitor auth state
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      logoutLink.style.display = 'inline';
-      loginStatus.textContent = `Logged in as: ${user.email || user.displayName}`;
-      signupStatus.textContent = '';
-      loginEmail.value = '';
-      loginPassword.value = '';
-      signupEmail.value = '';
-      signupPassword.value = '';
-    } else {
-      logoutLink.style.display = 'none';
-      loginStatus.textContent = 'Please log in.';
     }
-  });
 
-  logoutLink.onclick = () => {
-    auth.signOut();
-  };
-
-  // Simple Code Bot responder logic
-  function respond() {
-    const q = document.getElementById('question').value.toLowerCase();
-    const a = document.getElementById('answer');
-
-    if (q.includes("html")) {
-      a.value = "HTML is used to structure your webpage. Example:\n<html><head><title>My Page</title></head><body>Hello!</body></html>";
-    } else if (q.includes("css")) {
-      a.value = "CSS controls how things look. Example:\nbody { color: blue; }";
-    } else if (q.includes("javascript")) {
-      a.value = "JavaScript adds logic. Example:\ndocument.querySelector('button').onclick = () => alert('Hello!');";
-    } else {
-      a.value = "I’m still learning! More logic coming soon...";
+    function logout() {
+      auth.signOut().then(() => {
+        document.getElementById("login-btn").style.display = "inline-block";
+        document.getElementById("logout-btn").style.display = "none";
+        document.getElementById("user-info").innerText = "";
+      });
     }
-  }
-</script>
+
+    function switchTab(tabId) {
+      document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+      document.getElementById(tabId).classList.add("active");
+
+      document.querySelectorAll(".tab-button").forEach(btn => btn.classList.remove("active"));
+      event.target.classList.add("active");
+    }
+  </script>
 
 </body>
 </html>
