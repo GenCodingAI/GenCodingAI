@@ -1,93 +1,231 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Code Bot</title>
+  <title>Code Bot — By Liam Wills</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-      min-height: 100vh;
-      margin: 0;
-    }
-    h1 {
-      font-size: 3rem;
-      color: #38bdf8;
-      margin-bottom: 0.5em;
-    }
-    #chatbox {
-      width: 90%;
-      max-width: 800px;
-      background: #1e293b;
-      border-radius: 12px;
-      padding: 20px;
-      margin-top: 20px;
-      overflow-y: auto;
-      height: 400px;
+    /* Reset & base */
+    * {
       box-sizing: border-box;
     }
-    .message {
-      margin-bottom: 10px;
-      line-height: 1.4;
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #e0e6f1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: hidden;
+      animation: bgShift 20s ease infinite;
     }
+    @keyframes bgShift {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    header {
+      text-align: center;
+      padding: 2rem 1rem 0;
+      user-select: none;
+    }
+    header h1 {
+      font-size: 3.5rem;
+      margin: 0;
+      color: #61dafb;
+      letter-spacing: 0.15em;
+      text-shadow: 0 0 15px #61dafbaa;
+      animation: fadeInDown 1.2s ease forwards;
+      opacity: 0;
+    }
+    header p.subtitle {
+      margin: 0.5rem 0 1.5rem;
+      font-size: 1.2rem;
+      color: #a0cfffcc;
+      animation: fadeInDown 1.5s ease forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeInDown {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+    }
+
+    #chatbox {
+      flex-grow: 1;
+      max-width: 800px;
+      width: 90%;
+      background: rgba(255,255,255,0.08);
+      border-radius: 15px;
+      padding: 1.5rem 2rem;
+      margin: 0 auto 1.5rem;
+      overflow-y: auto;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      backdrop-filter: blur(12px);
+      animation: fadeIn 2s ease forwards;
+      opacity: 0;
+    }
+    @keyframes fadeIn {
+      to {opacity: 1;}
+      from {opacity: 0;}
+    }
+
+    .message {
+      margin-bottom: 1.1rem;
+      line-height: 1.4;
+      font-size: 1.05rem;
+      padding: 0.6rem 1rem;
+      border-radius: 12px;
+      max-width: 80%;
+      word-wrap: break-word;
+      animation: messagePop 0.3s ease forwards;
+    }
+    @keyframes messagePop {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
     .user {
-      color: #38bdf8;
+      background: #61dafb;
+      color: #0b111a;
+      align-self: flex-end;
+      border-bottom-right-radius: 2px;
+      box-shadow: 0 0 6px #61dafbaa;
     }
     .bot {
-      color: #facc15;
+      background: #233554;
+      color: #d3e3f7;
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
+      box-shadow: 0 0 6px #4aa4f8aa;
     }
+
     #inputArea {
-      margin-top: 20px;
-      display: flex;
-      width: 90%;
       max-width: 800px;
+      width: 90%;
+      margin: 0 auto 2rem;
+      display: flex;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      border-radius: 50px;
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+      animation: fadeIn 2.5s ease forwards;
+      opacity: 0;
     }
     #prompt {
       flex: 1;
-      padding: 10px;
-      font-size: 1rem;
       border: none;
-      border-radius: 8px 0 0 8px;
+      padding: 1rem 1.5rem;
+      font-size: 1.15rem;
+      color: #f0f7ff;
+      background: transparent;
       outline: none;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      transition: background-color 0.3s ease;
+    }
+    #prompt::placeholder {
+      color: #a3b9d8aa;
+      font-weight: 400;
+    }
+    #prompt:focus {
+      background: rgba(255,255,255,0.15);
     }
     #sendBtn {
-      padding: 10px 20px;
-      font-size: 1rem;
-      background: #38bdf8;
+      background: #61dafb;
       border: none;
-      border-radius: 0 8px 8px 0;
-      color: black;
+      padding: 0 2.2rem;
       cursor: pointer;
-      transition: background 0.3s ease;
+      font-weight: 700;
+      color: #0b111a;
+      font-size: 1.3rem;
+      transition: background-color 0.25s ease;
+      user-select: none;
+      border-radius: 0 50px 50px 0;
+      box-shadow: 0 0 10px #61dafbcc;
     }
     #sendBtn:hover {
-      background: #0ea5e9;
+      background-color: #4fc3f7;
+      box-shadow: 0 0 20px #4fc3f7cc;
+    }
+    #sendBtn:active {
+      transform: scale(0.96);
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.85rem;
+      color: #a0b8d4aa;
+      border-top: 1px solid #2b3a55;
+      user-select: none;
+      font-style: italic;
+      letter-spacing: 0.03em;
+    }
+
+    footer a {
+      color: #61dafbcc;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <h1>🤖 Code Bot</h1>
+  <header>
+    <h1>🤖 Code Bot</h1>
+    <p class="subtitle">Ask me anything about coding — safe & secure!</p>
+  </header>
+
   <div id="chatbox"></div>
+
   <div id="inputArea">
     <input
       type="text"
       id="prompt"
-      placeholder="Ask Code Bot anything about coding..."
+      placeholder="Type your coding question here..."
       autocomplete="off"
+      spellcheck="false"
+      aria-label="Message input"
     />
-    <button id="sendBtn">Send</button>
+    <button id="sendBtn" aria-label="Send message">Send</button>
   </div>
+
+  <footer>
+    By <strong>Liam Wills</strong> &mdash; All your coding questions answered.<br />
+    <small>Uses OpenRouter AI API — your data is <em>safe</em> and <em>not stored</em> by Code Bot.</small>
+  </footer>
 
   <script>
     const chatbox = document.getElementById('chatbox');
     const promptInput = document.getElementById('prompt');
     const sendBtn = document.getElementById('sendBtn');
+
+    function addMessage(sender, text, type) {
+      const msg = document.createElement('div');
+      msg.className = `message ${type}`;
+      msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
+      chatbox.appendChild(msg);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
 
     async function askCodeBot(prompt) {
       addMessage('You', prompt, 'user');
@@ -96,7 +234,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer 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'
+            'Authorization': 'Bearer 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'
           },
           body: JSON.stringify({
             model: 'openai/gpt-3.5-turbo',
@@ -104,21 +242,17 @@
           })
         });
 
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
         const data = await response.json();
         const botReply = data.choices[0].message.content;
         addMessage('Code Bot', botReply, 'bot');
       } catch (error) {
-        addMessage('Code Bot', 'Oops! Something went wrong.', 'bot');
+        addMessage('Code Bot', 'Oops! Something went wrong. Try again later.', 'bot');
         console.error(error);
       }
-    }
-
-    function addMessage(sender, text, type) {
-      const msg = document.createElement('div');
-      msg.className = `message ${type}`;
-      msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
-      chatbox.appendChild(msg);
-      chatbox.scrollTop = chatbox.scrollHeight;
     }
 
     sendBtn.addEventListener('click', () => {
@@ -135,3 +269,4 @@
   </script>
 </body>
 </html>
+<!-- force update -->
