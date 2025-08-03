@@ -1,2 +1,2 @@
 # code-bot
-Code Bot: https://GlizzyGuy09.github.io/code-bot/
+Code Bot: https://bit.ly/CodeBot_AI
