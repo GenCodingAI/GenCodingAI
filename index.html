@@ -1,150 +1,728 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Code Bot</title>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f4f4;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Code Bot - AI Chat & Assistant</title>
+
+<style>
+  /* --- Reset & Base Styles --- */
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+    font-family: 'Orbitron', sans-serif;
+    user-select: none;
+  }
+  html, body {
+    height: 100%;
+    background: #010a13;
+    color: #0ff;
+    overflow-x: hidden;
+    transition: background 0.5s ease, color 0.5s ease;
+  }
+  a {
+    color: #0ff;
+    text-decoration: none;
+  }
+  button {
+    cursor: pointer;
+  }
+
+  /* --- Header --- */
+  header {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: #01101e;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 0 15px #00f4ff;
+    z-index: 1000;
+  }
+  header h1 {
+    font-size: 2.5rem;
+    color: #0ff;
+    text-shadow: 0 0 15px #00f4ff;
+  }
+  #settingsBtn {
+    font-size: 2rem;
+    color: #0ff;
+    user-select: none;
+    transition: color 0.3s ease;
+  }
+  #settingsBtn:hover, #settingsBtn:focus {
+    color: #fff;
+    outline: none;
+  }
+
+  /* --- Main Content --- */
+  main {
+    margin: 90px auto 40px auto;
+    max-width: 900px;
+    background: rgba(0, 255, 255, 0.1);
+    padding: 2rem 2rem 1rem 2rem;
+    border-radius: 20px;
+    box-shadow: 0 0 35px #00ffff77;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 150px);
+  }
+
+  /* --- Chat Box --- */
+  #chatBox {
+    flex-grow: 1;
+    overflow-y: auto;
+    background: #011426;
+    border-radius: 15px;
+    padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+    box-shadow: inset 0 0 20px #00fff7aa;
+    font-size: 1.2rem;
+    line-height: 1.4;
+    color: #0ff;
+  }
+  .message {
+    max-width: 70%;
+    padding: 1rem 1.3rem;
+    margin: 1rem 0;
+    border-radius: 25px;
+    box-shadow: 0 0 15px #00fff7aa;
+    animation: fadeIn 0.4s ease forwards;
+    opacity: 0;
+  }
+  .userMessage {
+    background: linear-gradient(135deg, #00fff7, #00b7f7);
+    color: #000;
+    align-self: flex-end;
+    text-align: right;
+    animation-delay: 0.1s;
+  }
+  .botMessage {
+    background: linear-gradient(135deg, #05192f, #0e5270);
+    color: #0ff;
+    align-self: flex-start;
+    text-align: left;
+    animation-delay: 0.15s;
+    white-space: pre-wrap;
+  }
+
+  /* --- Input Area --- */
+  #inputArea {
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+  }
+  #userInput {
+    flex-grow: 1;
+    font-size: 1.3rem;
+    padding: 1rem 1.5rem;
+    border-radius: 30px;
+    border: none;
+    background: #011426;
+    color: #0ff;
+    box-shadow: inset 0 0 15px #00fff7aa;
+    outline-offset: 2px;
+    outline-color: #00fff7aa;
+    transition: box-shadow 0.3s ease;
+  }
+  #userInput::placeholder {
+    color: #0ff7;
+  }
+  #userInput:focus {
+    box-shadow: inset 0 0 30px #00ffffcc;
+  }
+  #sendBtn {
+    background: #00fff7;
+    border: none;
+    border-radius: 30px;
+    padding: 0 2.5rem;
+    font-weight: 900;
+    font-size: 1.3rem;
+    color: #000;
+    box-shadow: 0 0 25px #00fff7;
+    transition: transform 0.2s ease;
+  }
+  #sendBtn:hover:not(:disabled) {
+    transform: scale(1.1);
+    box-shadow: 0 0 35px #00fff7;
+  }
+  #sendBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* --- Settings Panel --- */
+  #settingsPanel {
+    position: fixed;
+    top: 60px;
+    right: -420px;
+    width: 380px;
+    height: calc(100% - 80px);
+    background: #011426dd;
+    box-shadow: -5px 0 25px #00ffffaa;
+    backdrop-filter: blur(12px);
+    padding: 2rem 2.5rem;
+    border-radius: 20px 0 0 20px;
+    color: #0ff;
+    transition: right 0.4s ease;
+    overflow-y: auto;
+    z-index: 1100;
+  }
+  #settingsPanel.open {
+    right: 0;
+  }
+  #settingsPanel h2 {
+    text-align: center;
+    font-weight: 900;
+    font-size: 2.4rem;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 12px #00ffffbb;
+  }
+  #closeSettings {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 2.2rem;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.3s ease;
+  }
+  #closeSettings:hover, #closeSettings:focus {
+    color: #fff;
+    outline: none;
+  }
+
+  /* --- Settings Tabs --- */
+  .tab-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #00fff7aa;
+  }
+  .tab-buttons button {
+    background: transparent;
+    border: none;
+    color: #0ff;
+    font-size: 1.1rem;
+    padding: 0.7rem 1.1rem;
+    border-radius: 15px 15px 0 0;
+    transition: background 0.3s ease;
+  }
+  .tab-buttons button.active,
+  .tab-buttons button:hover {
+    background: #00fff7cc;
+    color: #000;
+    font-weight: 900;
+  }
+  .tab-content {
+    display: none;
+  }
+  .tab-content.active {
+    display: block;
+  }
+
+  /* --- Settings Form --- */
+  label {
+    font-weight: 700;
+    margin: 1rem 0 0.4rem 0;
+    display: block;
+    font-size: 1.05rem;
+  }
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    border: none;
+    background: #022b40;
+    color: #0ff;
+    font-size: 1.1rem;
+    box-shadow: inset 0 0 15px #00ffffaa;
+  }
+  input[type="checkbox"] {
+    transform: scale(1.2);
+    cursor: pointer;
+    margin-right: 0.6rem;
+  }
+  button.saveBtn {
+    margin-top: 1.8rem;
+    padding: 0.9rem 1.8rem;
+    border-radius: 30px;
+    border: none;
+    background: #00fff7;
+    color: #000;
+    font-weight: 900;
+    font-size: 1.2rem;
+    width: 100%;
+    box-shadow: 0 0 25px #00fff7;
+    transition: background 0.3s ease;
+  }
+  button.saveBtn:hover:not(:disabled) {
+    background: #00ddf7;
+    box-shadow: 0 0 40px #00ddf7;
+  }
+  button.saveBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* --- User Info --- */
+  #userInfo {
+    margin: 0.8rem 0 1rem 0;
+    font-weight: 700;
+    text-align: center;
+    font-size: 1.1rem;
+    color: #0ff;
+    user-select: text;
+  }
+  #userEmail {
+    font-weight: 900;
+    color: #00fff7;
+  }
+  #logoutBtn {
+    margin-top: 10px;
+    background: #ff5555;
+    border: none;
+    border-radius: 20px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #fff;
+    box-shadow: 0 0 20px #ff5555aa;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  #logoutBtn:hover {
+    background: #ff2a2a;
+    box-shadow: 0 0 30px #ff2a2aaa;
+  }
+
+  /* --- Responsive --- */
+  @media (max-width: 600px) {
+    main {
+      margin: 110px 15px 40px 15px;
+      padding: 1.5rem 1.5rem 1rem 1.5rem;
+      border-radius: 15px;
     }
-    header {
-      background: #111;
-      color: white;
-      padding: 1em;
-      text-align: center;
+    #settingsPanel {
+      width: 100vw;
+      height: calc(100% - 60px);
+      top: 60px;
+      right: -100vw;
+      border-radius: 0;
     }
-    nav {
-      display: flex;
-      background: #222;
-      justify-content: center;
+    #settingsPanel.open {
+      right: 0;
     }
-    nav button {
-      background: none;
-      border: none;
-      color: white;
-      padding: 1em;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    nav button:hover, nav .active {
-      background: #444;
-    }
-    section {
-      display: none;
-      padding: 2em;
-    }
-    section.active {
-      display: block;
-    }
-    .login-area {
-      text-align: center;
-      margin-top: 2em;
-    }
-    #login-btn, #logout-btn {
-      background: #4285F4;
-      color: white;
-      padding: 0.5em 1.5em;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    #logout-btn {
-      background: #DB4437;
-    }
-    .user-info {
-      text-align: center;
-      margin-top: 1em;
-      font-size: 18px;
-    }
-  </style>
+  }
+
+  /* --- Animations --- */
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 0 10px #00fff7, 0 0 20px #00fff7aa; }
+    50% { box-shadow: 0 0 30px #00fff7, 0 0 40px #00fff7cc; }
+  }
+  #settingsBtn {
+    animation: glowPulse 2.5s infinite;
+  }
+
+  /* --- Scrollbar --- */
+  #chatBox::-webkit-scrollbar {
+    width: 10px;
+  }
+  #chatBox::-webkit-scrollbar-track {
+    background: #011426;
+    border-radius: 10px;
+  }
+  #chatBox::-webkit-scrollbar-thumb {
+    background: #00fff7cc;
+    border-radius: 10px;
+  }
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet" />
+
 </head>
 <body>
 
-  <header>
-    <h1>Code Bot</h1>
-  </header>
+<header>
+  <h1>💻 Code Bot</h1>
+  <button id="settingsBtn" aria-label="Settings">⚙️</button>
+</header>
 
-  <nav>
-    <button class="tab-button active" onclick="switchTab('home')">Home</button>
-    <button class="tab-button" onclick="switchTab('about')">About</button>
-    <button class="tab-button" onclick="switchTab('features')">Features</button>
-    <button class="tab-button" onclick="switchTab('contact')">Contact</button>
-  </nav>
+<main>
+  <div id="chatBox" role="log" aria-live="polite" aria-relevant="additions"></div>
+  <form id="inputArea" autocomplete="off" aria-label="Send message form">
+    <textarea id="userInput" rows="2" placeholder="Ask me anything coding-related..." aria-label="Message input"></textarea>
+    <button id="sendBtn" type="submit" aria-label="Send message">➤</button>
+  </form>
+</main>
 
-  <div class="login-area">
-    <button id="login-btn" onclick="signInWithGoogle()">Sign in with Google</button>
-    <button id="logout-btn" onclick="logout()" style="display:none;">Logout</button>
+<aside id="settingsPanel" aria-hidden="true" aria-label="Settings panel">
+  <button id="closeSettings" aria-label="Close settings panel">✖</button>
+  <h2>Settings</h2>
+
+  <div class="tab-buttons" role="tablist">
+    <button class="tab-btn active" data-tab="api" role="tab" aria-selected="true" tabindex="0" id="tabApiBtn">API Key</button>
+    <button class="tab-btn" data-tab="firebase" role="tab" aria-selected="false" tabindex="-1" id="tabFirebaseBtn">Firebase</button>
+    <button class="tab-btn" data-tab="account" role="tab" aria-selected="false" tabindex="-1" id="tabAccountBtn">Account</button>
+    <button class="tab-btn" data-tab="appearance" role="tab" aria-selected="false" tabindex="-1" id="tabAppearanceBtn">Appearance</button>
   </div>
-  <div class="user-info" id="user-info"></div>
 
-  <section id="home" class="active">
-    <h2>Welcome to Code Bot</h2>
-    <p>This is your smart Roblox AI coding assistant. Explore the tabs to learn more.</p>
+  <section id="tabApi" class="tab-content active" role="tabpanel" aria-labelledby="tabApiBtn" tabindex="0">
+    <label for="apiKeyInput">OpenAI API Key</label>
+    <input type="password" id="apiKeyInput" placeholder="Paste your OpenAI API key here" aria-describedby="apiHelp" autocomplete="new-password" />
+    <small id="apiHelp">Your key is stored locally in this browser only.</small>
   </section>
 
-  <section id="about">
-    <h2>About</h2>
-    <p>Code Bot is designed to help Roblox developers with AI-powered code generation and guidance.</p>
+  <section id="tabFirebase" class="tab-content" role="tabpanel" aria-labelledby="tabFirebaseBtn" tabindex="0">
+    <label for="firebaseApiKey">Firebase API Key</label>
+    <input type="text" id="firebaseApiKey" placeholder="Firebase API Key" autocomplete="off" />
+    <label for="firebaseAuthDomain">Firebase Auth Domain</label>
+    <input type="text" id="firebaseAuthDomain" placeholder="Firebase Auth Domain" autocomplete="off" />
+    <label for="firebaseProjectId">Firebase Project ID</label>
+    <input type="text" id="firebaseProjectId" placeholder="Firebase Project ID" autocomplete="off" />
+    <label for="firebaseAppId">Firebase App ID</label>
+    <input type="text" id="firebaseAppId" placeholder="Firebase App ID" autocomplete="off" />
+    <button class="saveBtn" id="saveSettingsBtn">Save & Initialize Firebase</button>
   </section>
 
-  <section id="features">
-    <h2>Features</h2>
-    <ul>
-      <li>Smart Roblox code help</li>
-      <li>AI chat for instant support</li>
-      <li>Gamepass GUI & scripts</li>
-    </ul>
+  <section id="tabAccount" class="tab-content" role="tabpanel" aria-labelledby="tabAccountBtn" tabindex="0">
+    <button id="googleLoginBtn" style="background:#4285F4; color:#fff; padding: 0.7rem 1rem; border:none; border-radius:12px; font-weight:700; font-size:1.2rem;">Sign in with Google</button>
+    <div id="userInfo" aria-live="polite" style="margin-top: 1rem; font-weight: 700; color: #0ff;"></div>
+    <button id="logoutBtn" style="background:#ff5555; color:#fff; padding: 0.5rem 1rem; border:none; border-radius:12px; font-weight:700; font-size:1rem; margin-top:10px; display:none;">Logout</button>
   </section>
 
-  <section id="contact">
-    <h2>Contact</h2>
-    <p>Reach out at: <a href="mailto:skullies09@gmail.com">skullies09@gmail.com</a></p>
+  <section id="tabAppearance" class="tab-content" role="tabpanel" aria-labelledby="tabAppearanceBtn" tabindex="0">
+    <label><input type="checkbox" id="darkModeToggle" /> Enable Dark Mode</label>
   </section>
+</aside>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDsWqMO9cbFeHrLMVhYiPrIqpfk-5aeCT8",
-      authDomain: "code-bot-519.firebaseapp.com",
-      projectId: "code-bot-519",
-      storageBucket: "code-bot-519.appspot.com",
-      messagingSenderId: "472534217982",
-      appId: "1:472534217982:web:738758b6bee685a70fe1af",
-      measurementId: "G-MMQNGLMB3G"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+<script type="module">
+  // ------------- Imports -------------
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-    function signInWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).then((result) => {
-        document.getElementById("login-btn").style.display = "none";
-        document.getElementById("logout-btn").style.display = "inline-block";
-        document.getElementById("user-info").innerText = `Welcome, ${result.user.displayName}`;
+  // --- DOM Elements ---
+  const chatBox = document.getElementById('chatBox');
+  const userInput = document.getElementById('userInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsPanel = document.getElementById('settingsPanel');
+  const closeSettings = document.getElementById('closeSettings');
+  const apiKeyInput = document.getElementById('apiKeyInput');
+  const firebaseApiKeyInput = document.getElementById('firebaseApiKey');
+  const firebaseAuthDomainInput = document.getElementById('firebaseAuthDomain');
+  const firebaseProjectIdInput = document.getElementById('firebaseProjectId');
+  const firebaseAppIdInput = document.getElementById('firebaseAppId');
+  const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+  const googleLoginBtn = document.getElementById('googleLoginBtn');
+  const userInfo = document.getElementById('userInfo');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const darkModeToggle = document.getElementById('darkModeToggle');
+
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  // ------------- State -------------
+  let firebaseApp = null;
+  let firebaseAuth = null;
+  let currentUser = null;
+  let OPENAI_API_KEY = '';
+
+  // ------------- UTILITIES -------------
+
+  // Escape HTML for safety in chat messages
+  function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, function(m) {
+      return ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[m];
+    });
+  }
+
+  // Append a chat message (user or bot)
+  function appendMessage(text, sender='bot') {
+    const div = document.createElement('div');
+    div.classList.add('message');
+    div.classList.add(sender === 'user' ? 'userMessage' : 'botMessage');
+    div.textContent = text;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  // Show typing indicator
+  function showTyping() {
+    const typing = document.createElement('div');
+    typing.id = 'typingIndicator';
+    typing.classList.add('botMessage');
+    typing.textContent = "Code Bot is typing...";
+    chatBox.appendChild(typing);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+  // Remove typing indicator
+  function removeTyping() {
+    const typing = document.getElementById('typingIndicator');
+    if (typing) typing.remove();
+  }
+
+  // Load from localStorage
+  function loadStoredData() {
+    const storedKey = localStorage.getItem('openai_api_key');
+    if (storedKey) {
+      OPENAI_API_KEY = storedKey;
+      apiKeyInput.value = OPENAI_API_KEY;
+    }
+
+    // Firebase settings
+    const fbApiKey = localStorage.getItem('firebase_api_key');
+    const fbAuthDomain = localStorage.getItem('firebase_auth_domain');
+    const fbProjectId = localStorage.getItem('firebase_project_id');
+    const fbAppId = localStorage.getItem('firebase_app_id');
+
+    if (fbApiKey && fbAuthDomain && fbProjectId && fbAppId) {
+      firebaseApiKeyInput.value = fbApiKey;
+      firebaseAuthDomainInput.value = fbAuthDomain;
+      firebaseProjectIdInput.value = fbProjectId;
+      firebaseAppIdInput.value = fbAppId;
+      initializeFirebaseApp({
+        apiKey: fbApiKey,
+        authDomain: fbAuthDomain,
+        projectId: fbProjectId,
+        appId: fbAppId
       });
     }
 
-    function logout() {
-      auth.signOut().then(() => {
-        document.getElementById("login-btn").style.display = "inline-block";
-        document.getElementById("logout-btn").style.display = "none";
-        document.getElementById("user-info").innerText = "";
+    // Dark mode preference
+    const darkPref = localStorage.getItem('dark_mode');
+    if (darkPref === 'true') {
+      document.documentElement.style.setProperty('background', '#010a13');
+      document.documentElement.style.setProperty('color', '#0ff');
+      darkModeToggle.checked = true;
+    } else {
+      document.documentElement.style.setProperty('background', '#f4f4f4');
+      document.documentElement.style.setProperty('color', '#111');
+      darkModeToggle.checked = false;
+    }
+  }
+
+  // Save Firebase settings
+  function saveFirebaseSettings() {
+    const apiKey = firebaseApiKeyInput.value.trim();
+    const authDomain = firebaseAuthDomainInput.value.trim();
+    const projectId = firebaseProjectIdInput.value.trim();
+    const appId = firebaseAppIdInput.value.trim();
+
+    if (!apiKey || !authDomain || !projectId || !appId) {
+      alert("Please fill out all Firebase settings fields.");
+      return;
+    }
+
+    localStorage.setItem('firebase_api_key', apiKey);
+    localStorage.setItem('firebase_auth_domain', authDomain);
+    localStorage.setItem('firebase_project_id', projectId);
+    localStorage.setItem('firebase_app_id', appId);
+
+    initializeFirebaseApp({
+      apiKey,
+      authDomain,
+      projectId,
+      appId
+    });
+
+    alert("Firebase settings saved and initialized.");
+  }
+
+  // Initialize Firebase App & Auth
+  function initializeFirebaseApp(config) {
+    if (firebaseApp) {
+      firebaseApp.delete(); // cleanup previous app instance
+    }
+    firebaseApp = initializeApp({
+      apiKey: config.apiKey,
+      authDomain: config.authDomain,
+      projectId: config.projectId,
+      appId: config.appId
+    });
+    firebaseAuth = getAuth(firebaseApp);
+
+    onAuthStateChanged(firebaseAuth, (user) => {
+      currentUser = user;
+      updateUserUI();
+    });
+  }
+
+  // Update user UI on login/logout
+  function updateUserUI() {
+    if (currentUser) {
+      userInfo.textContent = `Logged in as: ${currentUser.email}`;
+      logoutBtn.style.display = 'inline-block';
+      googleLoginBtn.style.display = 'none';
+    } else {
+      userInfo.textContent = 'Not signed in';
+      logoutBtn.style.display = 'none';
+      googleLoginBtn.style.display = 'inline-block';
+    }
+  }
+
+  // Sign in with Google
+  async function signInWithGoogle() {
+    if (!firebaseAuth) {
+      alert("Firebase is not initialized. Please save Firebase settings first.");
+      return;
+    }
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(firebaseAuth, provider);
+    } catch (e) {
+      alert("Google sign-in failed: " + e.message);
+    }
+  }
+  // Sign out
+  async function signOutUser() {
+    if (!firebaseAuth) return;
+    try {
+      await signOut(firebaseAuth);
+    } catch (e) {
+      alert("Sign out failed: " + e.message);
+    }
+  }
+
+  // --- Tab switching ---
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabButtons.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+        b.setAttribute('tabindex', '-1');
       });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      btn.setAttribute('tabindex', '0');
+
+      tabContents.forEach(tc => tc.classList.remove('active'));
+      const tabId = btn.getAttribute('data-tab');
+      document.getElementById('tab' + tabId.charAt(0).toUpperCase() + tabId.slice(1)).classList.add('active');
+    });
+  });
+
+  // --- Settings Panel toggle ---
+  settingsBtn.addEventListener('click', () => {
+    settingsPanel.classList.toggle('open');
+    settingsPanel.setAttribute('aria-hidden', settingsPanel.classList.contains('open') ? 'false' : 'true');
+  });
+  closeSettings.addEventListener('click', () => {
+    settingsPanel.classList.remove('open');
+    settingsPanel.setAttribute('aria-hidden', 'true');
+  });
+
+  // --- Dark mode toggle ---
+  darkModeToggle.addEventListener('change', () => {
+    if (darkModeToggle.checked) {
+      document.documentElement.style.background = '#010a13';
+      document.documentElement.style.color = '#0ff';
+      localStorage.setItem('dark_mode', 'true');
+    } else {
+      document.documentElement.style.background = '#f4f4f4';
+      document.documentElement.style.color = '#111';
+      localStorage.setItem('dark_mode', 'false');
+    }
+  });
+
+  // --- Save API key on blur ---
+  apiKeyInput.addEventListener('blur', () => {
+    const key = apiKeyInput.value.trim();
+    if(key){
+      OPENAI_API_KEY = key;
+      localStorage.setItem('openai_api_key', key);
+      appendMessage("OpenAI API Key saved locally.", "bot");
+    }
+  });
+
+  // --- Send message & handle AI response ---
+  async function sendMessage(e) {
+    e.preventDefault();
+    let prompt = userInput.value.trim();
+    if (!prompt) return;
+    if (!OPENAI_API_KEY) {
+      alert("Please enter your OpenAI API Key in Settings > API Key tab.");
+      return;
     }
 
-    function switchTab(tabId) {
-      document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
-      document.getElementById(tabId).classList.add("active");
+    appendMessage(prompt, 'user');
+    userInput.value = '';
+    sendBtn.disabled = true;
+    showTyping();
 
-      document.querySelectorAll(".tab-button").forEach(btn => btn.classList.remove("active"));
-      event.target.classList.add("active");
+    try {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [{ role: "user", content: prompt }],
+          max_tokens: 500,
+          temperature: 0.8
+        }),
+      });
+
+      if(!response.ok) throw new Error(`OpenAI API error: ${response.status}`);
+
+      const data = await response.json();
+      const botReply = data.choices?.[0]?.message?.content || "Sorry, no response.";
+      removeTyping();
+      appendMessage(botReply, 'bot');
+    } catch (error) {
+      removeTyping();
+      appendMessage(`Error: ${error.message}`, 'bot');
     }
-  </script>
+    sendBtn.disabled = false;
+  }
+
+  // --- Save Firebase settings button ---
+  saveSettingsBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    saveFirebaseSettings();
+  });
+
+  // --- Google Login ---
+  googleLoginBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    signInWithGoogle();
+  });
+
+  // --- Logout ---
+  logoutBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    signOutUser();
+  });
+
+  // --- Init ---
+  function init() {
+    loadStoredData();
+  }
+
+  // --- Accessibility: Enter sends message ---
+  userInput.addEventListener('keydown', (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendBtn.click();
+    }
+  });
+
+  // --- Start ---
+  init();
+  document.getElementById('inputArea').addEventListener('submit', sendMessage);
+
+</script>
 
 </body>
 </html>
