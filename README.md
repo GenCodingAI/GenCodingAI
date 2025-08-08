@@ -1,2 +1,2 @@
 # code-bot
-Code Bot: https://bit.ly/CodeBot_AI
+GenCoding AI Bot: https://gencoding.pages.dev/
