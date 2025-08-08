@@ -1,198 +1,171 @@
-// public/script.js
-// Client-side: UI, Google sign-in, chat flow, settings
+(() => {
+  // Elements
+  const messages = document.getElementById('messages');
+  const input = document.getElementById('messageInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const settingsBtn = document.getElementById('settingsBtn');
+  const sidePanel = document.getElementById('sidePanel');
+  const animationsToggle = document.getElementById('animationsToggle');
+  const saveToggle = document.getElementById('saveToggle');
+  const fancyToggle = document.getElementById('fancyToggle');
+  const exportBtn = document.getElementById('exportBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const gsiButtonContainer = document.getElementById('gsi-button');
 
-const GOOGLE_CLIENT_ID = '472534217982-bjn2mbaq2t1f1s8jenqh6t389u595kcf.apps.googleusercontent.com'; // replace with your client id
-let idToken = null;
-let currentUser = null;
+  // State
+  let googleUser = null;
+  let chatHistory = [];
 
-// UI elements
-const messagesEl = document.getElementById('messages');
-const inputEl = document.getElementById('messageInput');
-const sendBtn = document.getElementById('sendBtn');
-const settingsBtn = document.getElementById('settingsBtn');
-const sidePanel = document.getElementById('sidePanel');
-const animationsToggle = document.getElementById('animationsToggle');
-const saveToggle = document.getElementById('saveToggle');
-const fancyToggle = document.getElementById('fancyToggle');
-const logoutBtn = document.getElementById('logoutBtn');
-const exportBtn = document.getElementById('exportBtn');
-
-// Utility: safe HTML escape
-function escapeHtml(s) {
-  if (!s) return '';
-  return s.replace(/[&<>"'`]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;', '`':'&#96;'})[c]);
-}
-
-// Append message bubble
-function appendMessage(text, who='bot', opts = {}) {
-  const b = document.createElement('div');
-  b.className = `bubble ${who}` + (animationsToggle.checked ? ' fadeIn' : '');
-  b.innerHTML = `<div>${escapeHtml(text)}</div><span class="timestamp">${new Date().toLocaleTimeString()}</span>`;
-  messagesEl.appendChild(b);
-  // optional fancy effect
-  if (fancyToggle.checked && who === 'bot') {
-    b.style.filter = 'drop-shadow(0 6px 20px rgba(43,209,255,0.06))';
-  }
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-}
-
-// Send chat message
-async function sendMessage() {
-  const txt = inputEl.value.trim();
-  if (!txt) return;
-  appendMessage(txt, 'user');
-  inputEl.value = '';
-  // show typing
-  const typing = document.createElement('div');
-  typing.className = 'bubble bot' + (animationsToggle.checked ? ' fadeIn' : '');
-  typing.textContent = 'GlizzyBot is thinking...';
-  messagesEl.appendChild(typing);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-
-  try {
-    const body = { message: txt };
-    if (idToken && saveToggle.checked) body.id_token = idToken;
-
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(body)
-    });
-
-    const data = await res.json();
-    typing.remove();
-    if (data && data.reply) {
-      appendMessage(data.reply, 'bot');
-    } else if (data && data.error) {
-      appendMessage('Error: ' + data.error, 'bot');
-    } else {
-      appendMessage('No reply from server.', 'bot');
+  // Google Sign-In callback
+  function handleCredentialResponse(response) {
+    try {
+      const userObject = jwt_decode(response.credential);
+      googleUser = userObject;
+      showLoggedInUI();
+      loadHistory();
+    } catch (err) {
+      console.error('Error decoding Google credential:', err);
+      googleUser = null;
     }
-  } catch (err) {
-    typing.remove();
-    appendMessage('Network/server error. Try again later.', 'bot');
-    console.error(err);
-  }
-}
-
-// keybinds
-inputEl.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') sendMessage();
-});
-sendBtn.addEventListener('click', sendMessage);
-
-// settings toggle (show/hide)
-settingsBtn.addEventListener('click', () => {
-  if (!sidePanel) return;
-  const visible = sidePanel.style.display !== 'flex';
-  sidePanel.style.display = visible ? 'flex' : 'none';
-  sidePanel.setAttribute('aria-hidden', visible ? 'false' : 'true');
-});
-
-// logout
-logoutBtn.addEventListener('click', () => {
-  idToken = null;
-  currentUser = null;
-  // re-init google sign in to show button again
-  initGoogleSignIn();
-  appendMessage('Logged out. You are now in public mode.', 'bot');
-});
-
-// export history (if logged in)
-exportBtn.addEventListener('click', async () => {
-  if (!idToken) {
-    alert('Sign in to export your saved history.');
-    return;
-  }
-  try {
-    const res = await fetch('/api/history', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ id_token: idToken })
-    });
-    const data = await res.json();
-    const blob = new Blob([JSON.stringify(data.history || [], null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'glizzy_history.json';
-    a.click();
-    URL.revokeObjectURL(url);
-  } catch (e) {
-    console.error(e);
-    alert('Failed to export history.');
-  }
-});
-
-// Google Identity: handle credential response
-function handleCredentialResponse(response) {
-  if (!response || !response.credential) return;
-  idToken = response.credential;
-  try {
-    const decoded = jwt_decode(response.credential);
-    currentUser = decoded;
-    appendMessage(`Welcome, ${decoded.name}! Signed in.`, 'bot');
-    // fetch and display history
-    loadHistory();
-  } catch (e) {
-    console.warn('Failed to decode token', e);
-  }
-}
-
-// initialize GSI
-function initGoogleSignIn() {
-  const container = document.getElementById('gsi-button');
-  if (!container) return;
-  container.innerHTML = '';
-
-  if (typeof google === 'undefined' || !google.accounts || !google.accounts.id) {
-    // retry shortly if GSI script hasn't loaded yet
-    setTimeout(initGoogleSignIn, 500);
-    return;
   }
 
-  google.accounts.id.initialize({
-    client_id: GOOGLE_CLIENT_ID,
-    callback: handleCredentialResponse,
-    auto_select: false
+  // Show/hide UI elements on login/logout
+  function showLoggedInUI() {
+    gsiButtonContainer.classList.add('hidden');
+    logoutBtn.classList.remove('hidden');
+    settingsBtn.classList.remove('hidden');
+    saveToggle.disabled = false;
+  }
+
+  function showLoggedOutUI() {
+    googleUser = null;
+    gsiButtonContainer.classList.remove('hidden');
+    logoutBtn.classList.add('hidden');
+    saveToggle.disabled = true;
+    chatHistory = [];
+    clearMessages();
+  }
+
+  // Clear chat display
+  function clearMessages() {
+    messages.innerHTML = '';
+  }
+
+  // Add message bubble
+  function addMessage(text, fromBot = false) {
+    const msg = document.createElement('div');
+    msg.className = 'message ' + (fromBot ? 'bot' : 'user');
+    msg.textContent = text;
+
+    if (fancyToggle.checked) {
+      msg.style.opacity = '0';
+      msg.style.transform = 'translateY(10px)';
+      messages.appendChild(msg);
+      requestAnimationFrame(() => {
+        msg.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+        msg.style.opacity = '1';
+        msg.style.transform = 'translateY(0)';
+      });
+    } else {
+      messages.appendChild(msg);
+    }
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  // Save chat history to localStorage if signed in & saving enabled
+  function saveHistory() {
+    if (!googleUser || !saveToggle.checked) return;
+    localStorage.setItem('glizzybot_history_' + googleUser.sub, JSON.stringify(chatHistory));
+  }
+
+  // Load chat history from localStorage
+  function loadHistory() {
+    if (!googleUser || !saveToggle.checked) {
+      chatHistory = [];
+      clearMessages();
+      return;
+    }
+    const stored = localStorage.getItem('glizzybot_history_' + googleUser.sub);
+    if (stored) {
+      chatHistory = JSON.parse(stored);
+      clearMessages();
+      chatHistory.forEach(msg => addMessage(msg.text, msg.fromBot));
+    }
+  }
+
+  // Add message to history and save
+  function appendToHistory(text, fromBot) {
+    chatHistory.push({ text, fromBot });
+    if (chatHistory.length > 100) chatHistory.shift(); // limit history
+    saveHistory();
+  }
+
+  // Send message to backend
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    addMessage(text, false);
+    appendToHistory(text, false);
+
+    try {
+      const res = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: text, user: googleUser ? googleUser.sub : null }),
+      });
+      if (!res.ok) throw new Error('Server error');
+      const data = await res.json();
+      const botReply = data.reply || 'No response.';
+      addMessage(botReply, true);
+      appendToHistory(botReply, true);
+    } catch (err) {
+      addMessage('Error: ' + err.message, true);
+    }
+  }
+
+  // Event listeners
+  sendBtn.addEventListener('click', sendMessage);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendMessage();
   });
 
-  google.accounts.id.renderButton(
-    container,
-    { theme: 'outline', size: 'large', text: 'signin_with' }
-  );
+  settingsBtn.addEventListener('click', () => {
+    const hidden = sidePanel.classList.toggle('hidden');
+    sidePanel.setAttribute('aria-hidden', hidden ? 'true' : 'false');
+  });
 
-  // optionally enable One Tap:
-  // google.accounts.id.prompt();
-}
+  exportBtn.addEventListener('click', () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(chatHistory, null, 2));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute('href', dataStr);
+    dlAnchor.setAttribute('download', 'glizzybot_history.json');
+    document.body.appendChild(dlAnchor);
+    dlAnchor.click();
+    dlAnchor.remove();
+  });
 
-// load saved user history (server-side saved)
-async function loadHistory() {
-  if (!idToken) return;
-  try {
-    const res = await fetch('/api/history', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ id_token: idToken })
+  clearBtn.addEventListener('click', () => {
+    chatHistory = [];
+    clearMessages();
+    saveHistory();
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    google.accounts.id.disableAutoSelect();
+    showLoggedOutUI();
+  });
+
+  // On load: initialize Google Sign-In and UI
+  window.onload = () => {
+    google.accounts.id.initialize({
+      client_id: '472534217982-bjn2mbaq2t1f1s8jenqh6t389u595kcf.apps.googleusercontent.com',
+      callback: handleCredentialResponse,
     });
-    const data = await res.json();
-    if (data && Array.isArray(data.history)) {
-      // clear messages and render history
-      messagesEl.innerHTML = '';
-      data.history.forEach(h => {
-        appendMessage(h.text, h.role === 'user' ? 'user' : 'bot');
-      });
-    }
-  } catch (e) {
-    console.warn('Failed to load history', e);
-  }
-}
-
-// initial welcome message
-appendMessage("Welcome to GlizzyBot — public chat is open. Sign in with Google to save history and unlock extra features.", 'bot');
-
-// start GSI and hide side panel by default
-(function init() {
-  sidePanel.style.display = 'none';
-  initGoogleSignIn();
+    google.accounts.id.renderButton(gsiButtonContainer, { theme: 'outline', size: 'large', width: 240 });
+    google.accounts.id.prompt();
+    showLoggedOutUI();
+    loadHistory();
+  };
 })();

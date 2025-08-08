@@ -1,13 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>GlizzyBot — Futuristic Chat</title>
   <link rel="stylesheet" href="styles.css" />
-  <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <!-- jwt-decode (client-side) -->
   <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
 </head>
 <body>
@@ -17,21 +15,22 @@
         <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><rect fill='%232bd1ff' rx='8' width='36' height='36'/></svg>" alt="logo" class="logo-img"/>
         <h1 class="logo">Glizzy<span>Bot</span></h1>
       </div>
-      <div class="top-controls">
+      <div class="top-controls" id="topControls">
         <div id="gsi-button" class="gsi-placeholder"></div>
+        <button id="logoutBtn" class="ghost hidden" title="Log out">🚪 Log out</button>
         <button id="settingsBtn" class="ghost" title="Settings">⚙️</button>
       </div>
     </header>
 
     <main class="chat-wrap">
-      <aside class="side-panel" id="sidePanel" aria-hidden="true">
+      <aside class="side-panel hidden" id="sidePanel" aria-hidden="true">
         <h2>Settings</h2>
         <div class="setting"><label><input type="checkbox" id="animationsToggle" checked> Animations</label></div>
         <div class="setting"><label><input type="checkbox" id="saveToggle" checked> Save history (Google users)</label></div>
         <div class="setting"><label><input type="checkbox" id="fancyToggle" checked> Fancy effects</label></div>
         <div style="margin-top:12px;">
           <button id="exportBtn" class="primary">Export History (JSON)</button>
-          <button id="logoutBtn" class="ghost">Log out</button>
+          <button id="clearBtn" class="ghost">Clear Chat</button>
         </div>
       </aside>
 
@@ -56,5 +55,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-
-
