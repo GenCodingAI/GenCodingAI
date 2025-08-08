@@ -1,7 +1,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GenCoding - The Ultimate AI Computer Programming Experience</title>
+  <title>GenCoding - The Best AI Computer Programming Experience</title>
   <meta name="google-site-verification" content="wnmHz1u7I5ExKiKCmM_K6EgDmRfAqzmIWWrf0TCvdB0" />
 </head>
 
@@ -731,7 +731,7 @@ html, body {
   <nav class="sidebar" aria-label="Primary navigation">
     <div class="sidebar-header">
       <img class="logo-img" src="https://i.imgur.com/J2bRVPq.png" alt="GlizzyBot Logo" />
-      <h1 class="logo-text">GlizzyBot</h1>
+      <h1 class="logo-text">GenBot</h1>
     </div>
     <div class="nav-tabs" role="tablist" aria-orientation="vertical">
       <button class="nav-tab active" id="tab-chat" role="tab" aria-selected="true" aria-controls="tabpanel-chat" tabindex="0">Chat</button>
@@ -739,7 +739,7 @@ html, body {
       <button class="nav-tab" id="tab-premium" role="tab" aria-selected="false" aria-controls="tabpanel-premium" tabindex="-1">Premium</button>
       <button class="nav-tab" id="tab-settings" role="tab" aria-selected="false" aria-controls="tabpanel-settings" tabindex="-1">Settings</button>
     </div>
-    <div class="sidebar-footer">Made with ✨ and neon glow by GlizzyGuy09</div>
+    <div class="sidebar-footer">Made with ✨ and neon glow by GenCodingAI</div>
   </nav>
 
   <header class="header">
@@ -756,7 +756,7 @@ html, body {
     <!-- CHAT TAB -->
     <section id="tabpanel-chat" class="tab-content active" role="tabpanel" aria-labelledby="tab-chat" tabindex="0">
       <div class="chat-container">
-        <div class="chat-header" aria-live="polite" aria-atomic="true">Ask GlizzyBot anything!</div>
+        <div class="chat-header" aria-live="polite" aria-atomic="true">Free Coding AI</div>
         <div class="messages" id="chatMessages" aria-live="polite" aria-relevant="additions"></div>
         <div class="chat-input-container">
           <textarea id="chatInput" placeholder="Type your question and press Enter..." aria-label="Chat input"></textarea>
@@ -768,7 +768,7 @@ html, body {
     <!-- CONTACT TAB -->
     <section id="tabpanel-contact" class="tab-content" role="tabpanel" aria-labelledby="tab-contact" tabindex="0">
       <div class="contact-container">
-        <h3>Contact GlizzyBot Team</h3>
+        <h3>Contact GenBot Team</h3>
         <form id="contactForm" class="contact-form" novalidate>
           <label for="contactName">Name</label>
           <input type="text" id="contactName" name="contactName" placeholder="Your full name" required minlength="2" maxlength="100" />
@@ -846,7 +846,7 @@ html, body {
   </main>
 
   <footer class="footer" role="contentinfo">
-    GlizzyBot © 2025 — Crafted with futuristic vibes by GlizzyGuy09
+    GenBot © 2025 — Crafted with futuristic vibes by GenBotAI
   </footer>
 </div>
 <script>
@@ -895,7 +895,7 @@ html, body {
   // Load chat history from localStorage
   function loadChatHistory() {
     if (!googleUser) return;
-    const data = localStorage.getItem('glizzybot_history_' + googleUser.sub);
+    const data = localStorage.getItem('GenBot_history_' + googleUser.sub);
     if (data) {
       try {
         chatHistory = JSON.parse(data);
@@ -999,7 +999,7 @@ html, body {
       alert('Please fill out the form correctly.');
       return;
     }
-    alert('Thanks for contacting GlizzyBot! We will get back to you soon.');
+    alert('Thanks for contacting GenBot! We will get back to you soon.');
     contactForm.reset();
   });
 
@@ -1081,13 +1081,13 @@ html, body {
   btnExport.addEventListener('click', () => {
     if (chatHistory.length === 0) return alert('No chat history to export.');
     let exportText = chatHistory
-      .map(msg => (msg.fromBot ? 'GlizzyBot: ' : 'You: ') + msg.text)
+      .map(msg => (msg.fromBot ? 'GenBot: ' : 'You: ') + msg.text)
       .join('\n');
     const blob = new Blob([exportText], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'glizzybot_chat_history.txt';
+    a.download = 'GenBot_chat_history.txt';
     a.click();
     URL.revokeObjectURL(url);
   });
@@ -1096,7 +1096,7 @@ html, body {
     if (!confirm('Clear chat history? This cannot be undone.')) return;
     chatHistory = [];
     clearMessages();
-    if (googleUser) localStorage.removeItem('glizzybot_history_' + googleUser.sub);
+    if (googleUser) localStorage.removeItem('GenBot_history_' + googleUser.sub);
   });
 
   // --- Google Sign-In handling ---
