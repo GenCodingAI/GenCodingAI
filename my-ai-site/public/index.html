@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>GlizzyBot — Futuristic Chat</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- jwt-decode (client-side) -->
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand">
+        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><rect fill='%232bd1ff' rx='8' width='36' height='36'/></svg>" alt="logo" class="logo-img"/>
+        <h1 class="logo">Glizzy<span>Bot</span></h1>
+      </div>
+      <div class="top-controls">
+        <div id="gsi-button" class="gsi-placeholder"></div>
+        <button id="settingsBtn" class="ghost" title="Settings">⚙️</button>
+      </div>
+    </header>
+
+    <main class="chat-wrap">
+      <aside class="side-panel" id="sidePanel" aria-hidden="true">
+        <h2>Settings</h2>
+        <div class="setting"><label><input type="checkbox" id="animationsToggle" checked> Animations</label></div>
+        <div class="setting"><label><input type="checkbox" id="saveToggle" checked> Save history (Google users)</label></div>
+        <div class="setting"><label><input type="checkbox" id="fancyToggle" checked> Fancy effects</label></div>
+        <div style="margin-top:12px;">
+          <button id="exportBtn" class="primary">Export History (JSON)</button>
+          <button id="logoutBtn" class="ghost">Log out</button>
+        </div>
+      </aside>
+
+      <section class="chat-area" role="main">
+        <div class="header-hint">
+          <h2>Ask GlizzyBot anything</h2>
+          <p class="muted">Public chat is open. Sign in with Google to save history & unlock extras.</p>
+        </div>
+
+        <div id="messages" class="messages" aria-live="polite" tabindex="0"></div>
+
+        <div class="composer">
+          <input id="messageInput" type="text" placeholder="Type your question and press Enter..." autocomplete="off" />
+          <button id="sendBtn" class="send">Send</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">Made with ✨ and a little sci-fi glow.</footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

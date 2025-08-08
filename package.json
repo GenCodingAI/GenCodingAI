@@ -1,0 +1,19 @@
+{
+  "name": "glizzybot",
+  "version": "1.0.0",
+  "description": "Futuristic sci-fi chatbot (public + Google sign-in + server-side OpenAI key)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "NODE_ENV=development node server.js"
+  },
+  "author": "You",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "google-auth-library": "^9.0.0",
+    "node-fetch": "^2.6.9"
+  }
+}
