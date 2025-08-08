@@ -3,588 +3,1082 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>GlizzyBot — Your Sci-Fi AI Chatbot</title>
+<title>GlizzyBot - The Ultimate Sci-Fi AI Chat Experience</title>
 
 <!-- Google Sign-In -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
 
 <style>
-/* === Reset & Base === */
+/* ===== Reset ===== */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
-body,
-html {
+html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #0a0f1a;
+  background: linear-gradient(135deg, #001a4d, #000b1a);
   color: #cce6ff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  user-select: none;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Scrollbar styling */
+/* Scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 12px;
+  height: 12px;
 }
 ::-webkit-scrollbar-track {
-  background: #11182b;
-  border-radius: 4px;
+  background: #00102a;
+  border-radius: 8px;
+  box-shadow: inset 0 0 5px #0033aa66;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1a75ff;
-  border-radius: 4px;
+  background: linear-gradient(180deg, #3399ffcc, #0d4fffcc);
+  border-radius: 8px;
+  box-shadow: inset 0 0 10px #0055ffaa;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a9cff;
+  background: linear-gradient(180deg, #66b3ff, #3377ff);
 }
 
-/* === Page container === */
+/* === Root container === */
 .page {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  grid-template-rows: 64px 1fr 44px;
+  grid-template-areas:
+    "sidebar header"
+    "sidebar main"
+    "sidebar footer";
+  height: 100vh;
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #00102a;
+  border-radius: 12px;
+  box-shadow:
+    0 0 25px #0045ffbb,
+    inset 0 0 40px #002a5a;
+  overflow: hidden;
+  user-select: text;
+}
+
+/* === Sidebar === */
+.sidebar {
+  grid-area: sidebar;
+  background: #001840;
+  border-right: 1.5px solid #0a48ffaa;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  max-width: 960px;
-  margin: 0 auto;
-  box-shadow:
-    0 0 10px #0af,
-    0 0 30px #08f,
-    inset 0 0 40px #05f;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #001028 0%, #001a47 100%);
-  overflow: hidden;
+  padding: 24px 18px;
+  color: #99cfffdd;
+  box-shadow: inset -2px 0 18px #0040ff44;
+  overflow-y: auto;
 }
 
-/* === Header === */
-.topbar {
+/* Sidebar header - logo */
+.sidebar-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background: #00182a;
-  padding: 0 20px;
-  height: 64px;
-  border-bottom: 1px solid #1048ff44;
-  box-shadow: 0 2px 12px #0a35ff88;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  gap: 12px;
+  margin-bottom: 36px;
   user-select: none;
 }
 
-.logo-img {
-  width: 40px;
-  height: 40px;
-  filter: drop-shadow(0 0 6px #33aaff);
-  border-radius: 8px;
+.sidebar-header img.logo-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  filter:
+    drop-shadow(0 0 8px #33aaff88)
+    drop-shadow(0 0 15px #55ccffcc);
 }
 
-.logo {
+.sidebar-header h1.logo-text {
   font-weight: 900;
+  font-size: 2rem;
+  color: #33aaff;
+  letter-spacing: 2px;
+  text-shadow:
+    0 0 12px #66b3ff,
+    0 0 22px #33aaffbb;
+  margin: 0;
+  user-select: none;
+}
+
+/* Sidebar nav */
+.nav-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: auto;
+}
+
+.nav-tab {
+  background: #002255bb;
+  padding: 14px 22px;
+  border-radius: 12px;
+  font-weight: 700;
+  color: #a1caffcc;
+  cursor: pointer;
+  text-align: center;
+  text-shadow:
+    0 0 6px #2a7fffaa;
+  box-shadow:
+    0 0 15px #0070ff88;
+  user-select: none;
+  transition:
+    background-color 0.35s ease,
+    box-shadow 0.4s ease,
+    color 0.3s ease;
+  border: 2.5px solid transparent;
+}
+
+.nav-tab:hover {
+  background: #0033ffdd;
+  color: #d0e9ff;
+  box-shadow:
+    0 0 20px #3399ffee,
+    0 0 40px #55bbffcc;
+}
+
+.nav-tab.active {
+  background: #0050ffee;
+  color: #effcff;
+  border: 2.5px solid #99ccff;
+  box-shadow:
+    0 0 30px #33aaffff,
+    inset 0 0 20px #66b3ffff;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Sidebar footer */
+.sidebar-footer {
+  margin-top: 32px;
+  font-size: 0.85rem;
+  color: #5599ffcc;
+  user-select: none;
+  text-align: center;
+  text-shadow: 0 0 5px #2277ffbb;
+}
+
+/* === Header === */
+.header {
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #00184a;
+  padding: 0 20px;
+  border-bottom: 1.5px solid #2244ffcc;
+  box-shadow: 0 2px 20px #0033ffaa inset;
+  user-select: none;
+  color: #a4caffcc;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.header-left h2 {
+  margin: 0;
+  font-weight: 800;
   font-size: 1.6rem;
-  color: #1af;
-  letter-spacing: 1.4px;
+  color: #33aaff;
   text-shadow:
-    0 0 8px #33aaff,
-    0 0 15px #55ccff;
+    0 0 15px #33aaffcc,
+    0 0 30px #55bbffdd;
 }
 
-.logo span {
-  color: #a2d9ff;
-  text-shadow:
-    0 0 10px #5ef,
-    0 0 25px #6ff;
-}
-
-/* === Top Controls === */
-.top-controls {
+.header-right {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-button.ghost {
+/* Google Signin container */
+#googleSignInDiv {
+  min-width: 180px;
+}
+
+/* Buttons */
+.btn {
   background: transparent;
-  border: 1.5px solid #3f8cff;
-  color: #88bbff;
+  border: 2.5px solid #33aaffcc;
+  color: #a4d2ffcc;
   font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 8px;
+  padding: 8px 20px;
+  border-radius: 14px;
   cursor: pointer;
-  transition: all 0.25s ease;
   user-select: none;
-  filter: drop-shadow(0 0 5px #44aaff88);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+  box-shadow:
+    0 0 12px #33aaff99;
 }
 
-button.ghost:hover:not(.hidden) {
-  background: #1a3f9f22;
-  border-color: #66aaff;
-  color: #bbddff;
-  filter: drop-shadow(0 0 10px #55aaffcc);
+.btn:hover {
+  background-color: #3399ffdd;
+  color: #e1f3ff;
+  border-color: #55aaffff;
+  box-shadow:
+    0 0 20px #66b3ffff,
+    0 0 40px #77cfffdd;
 }
 
-button.ghost:active {
+.btn:active {
   transform: scale(0.96);
 }
 
-button.ghost.hidden {
-  display: none;
-}
-
-/* === Main Chat Area === */
-.chat-wrap {
-  display: flex;
-  flex: 1;
-  background: #05102a;
-  overflow: hidden;
-  position: relative;
-}
-
-/* === Side Panel === */
-.side-panel {
-  width: 260px;
-  background: #0a1a3a;
-  border-right: 1px solid #0f3bbf66;
-  padding: 24px 20px;
-  color: #a4caffcc;
-  user-select: none;
-  box-shadow: inset -2px 0 15px #0550ff55;
-  transition: transform 0.3s ease;
+/* === Main content === */
+.main {
+  grid-area: main;
+  background: #00102a;
+  padding: 24px 28px;
   overflow-y: auto;
-}
-
-.side-panel.hidden {
-  transform: translateX(-280px);
-  pointer-events: none;
-  opacity: 0;
-}
-
-.side-panel h2 {
-  font-weight: 700;
-  font-size: 1.4rem;
-  margin-bottom: 20px;
-  color: #55aaffcc;
-  text-shadow: 0 0 10px #3f7cffaa;
-}
-
-.setting {
-  margin-bottom: 18px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.setting input[type="checkbox"] {
-  margin-right: 10px;
-  accent-color: #33aaff;
-  cursor: pointer;
-}
-
-/* === Chat Section === */
-.chat-area {
-  flex: 1;
+  user-select: text;
+  box-shadow:
+    inset 0 0 20px #0044ff66;
+  border-radius: 0 0 0 12px;
   display: flex;
   flex-direction: column;
-  padding: 24px 32px;
-  overflow: hidden;
-  position: relative;
-  color: #cce6ff;
-  user-select: text;
+  gap: 24px;
 }
 
-.header-hint {
-  margin-bottom: 18px;
+/* Hide scrollbar but keep scroll */
+.main::-webkit-scrollbar {
+  width: 10px;
 }
 
-.header-hint h2 {
-  margin: 0 0 6px 0;
-  font-weight: 800;
-  font-size: 1.8rem;
-  color: #2bd1ff;
-  text-shadow:
-    0 0 8px #33c7ff,
-    0 0 20px #55d4ff;
-}
-
-.header-hint p.muted {
-  margin: 0;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #77aee6aa;
-}
-
-/* === Messages Container === */
-.messages {
-  flex: 1;
-  overflow-y: auto;
-  padding-right: 10px;
-  margin-bottom: 12px;
-  background: #001530;
-  border-radius: 12px;
-  box-shadow:
-    inset 0 0 15px #0078ff44,
-    0 0 12px #0078ff88;
-  scrollbar-width: thin;
-  scrollbar-color: #3399ff44 transparent;
-}
-
-/* Message bubbles */
-.message {
-  max-width: 80%;
-  padding: 14px 20px;
-  border-radius: 20px;
-  margin-bottom: 12px;
-  font-size: 1rem;
-  line-height: 1.4;
-  user-select: text;
-  word-wrap: break-word;
-  box-shadow: 0 0 10px #33aaff33;
-  transition: background-color 0.3s ease;
-}
-
-.message.user {
-  background: linear-gradient(135deg, #0043ca, #2a9fff);
-  color: #d0e9ff;
-  margin-left: auto;
-  text-align: right;
-  box-shadow:
-    0 0 15px #2b9fffcc,
-    0 2px 8px #0d6fd6cc;
-}
-
-.message.bot {
-  background: linear-gradient(135deg, #0a3154, #00437f);
-  color: #a9d4ff;
-  margin-right: auto;
-  box-shadow:
-    0 0 15px #3388ffcc,
-    0 2px 8px #072c5acc;
-}
-
-/* === Composer Input Area === */
-.composer {
-  display: flex;
-  gap: 12px;
-  padding: 6px 0;
-}
-
-#messageInput {
-  flex: 1;
-  font-size: 1.05rem;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: none;
-  outline: none;
-  background: #001830;
-  color: #b3e0ff;
-  box-shadow:
-    inset 0 0 10px #2b94ffaa;
-  transition: box-shadow 0.3s ease;
-}
-
-#messageInput:focus {
-  box-shadow:
-    0 0 12px #3cb0ffdd,
-    inset 0 0 18px #3cb0ffcc;
-}
-
-button.send {
-  background: #3399ff;
-  color: #e1f0ff;
-  font-weight: 700;
-  font-size: 1.1rem;
-  border: none;
-  border-radius: 12px;
-  padding: 12px 24px;
-  cursor: pointer;
-  box-shadow:
-    0 0 10px #44aaffee,
-    0 0 20px #3399ffcc;
-  user-select: none;
-  transition: background 0.25s ease;
-}
-
-button.send:hover {
-  background: #44aaff;
-  box-shadow:
-    0 0 15px #55bbffee,
-    0 0 25px #44aaffcc;
-}
-
-button.send:active {
-  transform: scale(0.95);
+.main::-webkit-scrollbar-thumb {
+  background: #2255ffcc;
+  border-radius: 8px;
+  box-shadow: inset 0 0 12px #0055ffbb;
 }
 
 /* === Footer === */
 .footer {
-  font-size: 0.9rem;
-  text-align: center;
-  padding: 14px 0;
-  color: #44aaffaa;
+  grid-area: footer;
+  background: #00182a;
+  border-top: 1.5px solid #2244ffcc;
+  box-shadow: inset 0 2px 14px #0020aa;
+  font-size: 0.85rem;
+  color: #5599ffcc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   user-select: none;
-  text-shadow: 0 0 6px #2299ff88;
-  background: #001830;
-  border-top: 1px solid #002a5a;
+  text-shadow: 0 0 6px #2244ffaa;
+  padding: 10px 0;
 }
 
-/* === Responsive === */
-@media (max-width: 768px) {
+/* === Tabs Content Containers === */
+.tab-content {
+  display: none;
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 12px;
+  user-select: text;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* === Chat Tab === */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat-header {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #66aaff;
+  margin-bottom: 12px;
+  user-select: none;
+  text-shadow:
+    0 0 10px #33aaffcc;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background: #001a3a;
+  border-radius: 14px;
+  box-shadow:
+    inset 0 0 25px #003d99aa;
+  scrollbar-width: thin;
+  scrollbar-color: #5599ff99 transparent;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #cce8ffdd;
+  user-select: text;
+}
+
+.message {
+  max-width: 85%;
+  margin-bottom: 14px;
+  padding: 14px 20px;
+  border-radius: 24px;
+  box-shadow:
+    0 0 12px #2277ffbb;
+  line-break: anywhere;
+  word-wrap: break-word;
+  position: relative;
+  animation: fadeInUp 0.5s ease forwards;
+  opacity: 0;
+  transform: translateY(20px);
+  color: #bbddff;
+}
+
+.message.bot {
+  background: linear-gradient(135deg, #004080, #0060cc);
+  margin-left: 0;
+  box-shadow:
+    0 0 18px #3399ffbb,
+    inset 0 0 15px #0077ff99;
+  color: #ddf5ff;
+}
+
+.message.user {
+  background: linear-gradient(135deg, #0050ff, #3388ff);
+  margin-left: auto;
+  box-shadow:
+    0 0 20px #66b3ffcc,
+    inset 0 0 15px #0055ffcc;
+  color: #e9f2ff;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Chat input container */
+.chat-input-container {
+  display: flex;
+  margin-top: 16px;
+  gap: 14px;
+}
+
+#chatInput {
+  flex-grow: 1;
+  font-size: 1.15rem;
+  padding: 14px 22px;
+  border-radius: 22px;
+  border: none;
+  outline: none;
+  background: #002050;
+  color: #bbe6ff;
+  box-shadow:
+    inset 0 0 15px #0060ffbb;
+  transition: box-shadow 0.3s ease;
+  user-select: text;
+}
+
+#chatInput::placeholder {
+  color: #66aaffaa;
+  user-select: none;
+}
+
+#chatInput:focus {
+  box-shadow:
+    0 0 24px #3399ffcc,
+    inset 0 0 28px #44bbffcc;
+}
+
+.btn-send {
+  background: linear-gradient(135deg, #3399ff, #1a53cc);
+  border-radius: 22px;
+  border: none;
+  color: #e5f3ff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 14px 26px;
+  cursor: pointer;
+  user-select: none;
+  box-shadow:
+    0 0 20px #3399ffdd,
+    0 0 35px #66aaffcc;
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.btn-send:hover {
+  background: linear-gradient(135deg, #66aaff, #3388ff);
+  box-shadow:
+    0 0 25px #66bbffee,
+    0 0 45px #77ccffcc;
+}
+
+.btn-send:active {
+  transform: scale(0.96);
+}
+
+/* === Contact Tab === */
+.contact-container {
+  color: #bbe6ff;
+  max-width: 640px;
+  margin: auto;
+}
+
+.contact-container h3 {
+  font-weight: 700;
+  font-size: 1.6rem;
+  color: #33aaffcc;
+  margin-bottom: 20px;
+  user-select: none;
+  text-shadow:
+    0 0 12px #44bbffcc;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.contact-form label {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #5599ffdd;
+  user-select: none;
+}
+
+.contact-form input,
+.contact-form textarea {
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: none;
+  outline: none;
+  background: #002040dd;
+  color: #bbe6ff;
+  box-shadow:
+    inset 0 0 20px #0044ffaa;
+  font-size: 1rem;
+  resize: vertical;
+  transition: box-shadow 0.3s ease;
+}
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+  color: #5599ff99;
+  user-select: none;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  box-shadow:
+    0 0 24px #3399ffcc,
+    inset 0 0 28px #44bbffcc;
+}
+
+.contact-form button {
+  align-self: flex-start;
+  background: #3388ffcc;
+  border-radius: 20px;
+  border: none;
+  padding: 14px 36px;
+  color: #dceeff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow:
+    0 0 25px #3388ffcc;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.contact-form button:hover {
+  background: #44aaffee;
+  box-shadow:
+    0 0 36px #44aaffee;
+}
+
+.contact-form button:active {
+  transform: scale(0.96);
+}
+
+/* === Premium Tab === */
+.premium-container {
+  color: #bbe6ff;
+  padding: 16px 12px;
+  max-width: 720px;
+  margin: 0 auto;
+  user-select: text;
+}
+
+.premium-container h3 {
+  font-weight: 900;
+  font-size: 2rem;
+  color: #3399ffcc;
+  text-shadow:
+    0 0 15px #66aaffcc,
+    0 0 30px #3399ffbb;
+  margin-bottom: 28px;
+  user-select: none;
+  text-align: center;
+}
+
+.premium-cards {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.premium-card {
+  background: linear-gradient(135deg, #003366, #0050cc);
+  border-radius: 18px;
+  box-shadow:
+    0 0 30px #004dffcc,
+    inset 0 0 15px #0066ffbb;
+  color: #d0e9ff;
+  width: 260px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  user-select: none;
+  transition:
+    box-shadow 0.4s ease,
+    transform 0.3s ease;
+}
+
+.premium-card:hover {
+  box-shadow:
+    0 0 50px #33aaffee,
+    inset 0 0 35px #55bbffff;
+  transform: translateY(-10px);
+}
+
+.premium-card h4 {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: #99cfffcc;
+  text-shadow: 0 0 8px #55bbffcc;
+}
+
+.premium-card ul {
+  margin: 0;
+  padding-left: 20px;
+  list-style: disc;
+  color: #bbeeffcc;
+}
+
+.premium-card ul li {
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* === Settings Tab === */
+.settings-container {
+  color: #bbe6ff;
+  max-width: 600px;
+  margin: auto;
+  user-select: none;
+}
+
+.settings-container h3 {
+  font-weight: 900;
+  font-size: 2rem;
+  color: #33aaffcc;
+  margin-bottom: 24px;
+  text-shadow:
+    0 0 15px #66aaffcc;
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.settings-group label {
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: default;
+}
+
+.settings-group input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #33aaffcc;
+  border-radius: 6px;
+  box-shadow: 0 0 6px #33aaffcc inset;
+  transition: box-shadow 0.3s ease;
+}
+
+.settings-group input[type="checkbox"]:hover {
+  box-shadow: 0 0 12px #55bbffcc inset;
+}
+
+.settings-group input[type="checkbox"]:checked {
+  box-shadow: 0 0 24px #33aaffcc inset;
+}
+
+/* Buttons container */
+.settings-buttons {
+  margin-top: 32px;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.settings-buttons button {
+  background: #3388ffcc;
+  border-radius: 20px;
+  border: none;
+  padding: 14px 36px;
+  color: #dceeff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow:
+    0 0 25px #3388ffcc;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.settings-buttons button:hover {
+  background: #44aaffee;
+  box-shadow:
+    0 0 36px #44aaffee;
+}
+
+.settings-buttons button:active {
+  transform: scale(0.96);
+}
+
+/* === Animations for everything fancy === */
+@keyframes glowPulse {
+  0%, 100% {
+    text-shadow:
+      0 0 12px #33aaffaa,
+      0 0 24px #55bbffcc;
+  }
+  50% {
+    text-shadow:
+      0 0 22px #66ccffdd,
+      0 0 44px #99ddffee;
+  }
+}
+
+@keyframes glowMove {
+  0%, 100% {
+    box-shadow:
+      0 0 15px #3399ffcc,
+      inset 0 0 20px #44bbffcc;
+  }
+  50% {
+    box-shadow:
+      0 0 28px #66bbffcc,
+      inset 0 0 36px #77ccffcc;
+  }
+}
+
+/* Responsive tweaks */
+@media (max-width: 820px) {
   .page {
-    max-width: 100%;
+    grid-template-columns: 1fr;
+    grid-template-rows: 64px 1fr 44px;
+    grid-template-areas:
+      "header"
+      "main"
+      "footer";
     border-radius: 0;
   }
-
-  .side-panel {
-    position: absolute;
-    z-index: 10;
-    height: calc(100vh - 64px);
-    top: 64px;
-    left: 0;
-    box-shadow: 2px 0 20px #0040ffcc;
-    background: #051943cc;
-    backdrop-filter: blur(8px);
+  .sidebar {
+    display: none;
   }
-
-  .side-panel.hidden {
-    transform: translateX(-280px);
+  .header-left h2 {
+    font-size: 1.3rem;
   }
-
-  .chat-wrap {
-    flex-direction: column;
-  }
-
-  .chat-area {
-    padding: 16px;
+  .main {
+    padding: 16px 20px;
   }
 }
 
-/* === Animations for side panel & messages === */
-.side-panel,
-.message {
-  will-change: transform, opacity;
-}
 </style>
 </head>
-
 <body>
-<div class="page" role="main" aria-label="GlizzyBot AI Chat Application">
-
-  <!-- Header -->
-  <header class="topbar" role="banner">
-    <div class="brand" aria-label="Site Logo and Name">
-      <img src="https://i.imgur.com/xcR6yM2.png" alt="GlizzyBot Logo" class="logo-img" />
-      <div class="logo">Glizzy<span>Bot</span></div>
+<div class="page" role="application" aria-label="GlizzyBot AI chat interface">
+  <nav class="sidebar" aria-label="Primary navigation">
+    <div class="sidebar-header">
+      <img class="logo-img" src="https://i.imgur.com/J2bRVPq.png" alt="GlizzyBot Logo" />
+      <h1 class="logo-text">GlizzyBot</h1>
     </div>
+    <div class="nav-tabs" role="tablist" aria-orientation="vertical">
+      <button class="nav-tab active" id="tab-chat" role="tab" aria-selected="true" aria-controls="tabpanel-chat" tabindex="0">Chat</button>
+      <button class="nav-tab" id="tab-contact" role="tab" aria-selected="false" aria-controls="tabpanel-contact" tabindex="-1">Contact</button>
+      <button class="nav-tab" id="tab-premium" role="tab" aria-selected="false" aria-controls="tabpanel-premium" tabindex="-1">Premium</button>
+      <button class="nav-tab" id="tab-settings" role="tab" aria-selected="false" aria-controls="tabpanel-settings" tabindex="-1">Settings</button>
+    </div>
+    <div class="sidebar-footer">Made with ✨ and neon glow by GlizzyGuy09</div>
+  </nav>
 
-    <div class="top-controls" id="topControls" aria-label="User controls and sign in">
-      <div id="gsi-button" aria-live="polite" aria-atomic="true" aria-relevant="additions"></div>
-      <button class="ghost hidden" id="logoutBtn" aria-label="Log out">Logout</button>
-      <button class="ghost hidden" id="settingsBtn" aria-label="Open settings">⚙️</button>
+  <header class="header">
+    <div class="header-left">
+      <h2 id="current-tab-title">Chat</h2>
+    </div>
+    <div class="header-right">
+      <div id="googleSignInDiv" aria-label="Google sign-in button"></div>
+      <button id="btnLogout" class="btn" hidden aria-label="Log out from Google">Logout</button>
     </div>
   </header>
 
-  <!-- Main content area -->
-  <section class="chat-wrap">
-    <!-- Side panel for settings -->
-    <aside id="sidePanel" class="side-panel hidden" role="region" aria-label="Settings panel" aria-hidden="true">
-      <h2>Settings</h2>
-      <label class="setting" for="animationsToggle">
-        <input type="checkbox" id="animationsToggle" checked />
-        Enable Animations
-      </label>
-      <label class="setting" for="fancyToggle">
-        <input type="checkbox" id="fancyToggle" checked />
-        Fancy Message Animations
-      </label>
-      <label class="setting" for="saveToggle">
-        <input type="checkbox" id="saveToggle" />
-        Save Chat History (requires login)
-      </label>
-      <button class="ghost" id="exportBtn" aria-label="Export chat history">Export History</button>
-      <button class="ghost" id="clearBtn" aria-label="Clear chat history">Clear History</button>
-    </aside>
-
-    <!-- Chat area -->
-    <article class="chat-area" role="main" aria-live="polite" aria-atomic="false" aria-relevant="additions">
-      <div class="header-hint">
-        <h2>Ask GlizzyBot anything</h2>
-        <p class="muted">Public chat is open. Sign in with Google to save history &amp; unlock extras.</p>
+  <main class="main">
+    <!-- CHAT TAB -->
+    <section id="tabpanel-chat" class="tab-content active" role="tabpanel" aria-labelledby="tab-chat" tabindex="0">
+      <div class="chat-container">
+        <div class="chat-header" aria-live="polite" aria-atomic="true">Ask GlizzyBot anything!</div>
+        <div class="messages" id="chatMessages" aria-live="polite" aria-relevant="additions"></div>
+        <div class="chat-input-container">
+          <textarea id="chatInput" placeholder="Type your question and press Enter..." aria-label="Chat input"></textarea>
+          <button id="btnSend" class="btn-send" aria-label="Send chat message">Send</button>
+        </div>
       </div>
+    </section>
 
-      <section id="messages" class="messages" tabindex="0" aria-label="Chat messages"></section>
-
-      <div class="composer">
-        <input
-          id="messageInput"
-          name="messageInput"
-          type="text"
-          placeholder="Type your question and press Enter..."
-          autocomplete="off"
-          aria-label="Chat message input"
-          spellcheck="false"
-          autocorrect="off"
-          autocapitalize="none"
-          aria-live="off"
-        />
-        <button class="send" id="sendBtn" aria-label="Send message">Send</button>
+    <!-- CONTACT TAB -->
+    <section id="tabpanel-contact" class="tab-content" role="tabpanel" aria-labelledby="tab-contact" tabindex="0">
+      <div class="contact-container">
+        <h3>Contact GlizzyBot Team</h3>
+        <form id="contactForm" class="contact-form" novalidate>
+          <label for="contactName">Name</label>
+          <input type="text" id="contactName" name="contactName" placeholder="Your full name" required minlength="2" maxlength="100" />
+          
+          <label for="contactEmail">Email</label>
+          <input type="email" id="contactEmail" name="contactEmail" placeholder="your.email@example.com" required />
+          
+          <label for="contactMessage">Message</label>
+          <textarea id="contactMessage" name="contactMessage" placeholder="Write your message here" rows="6" required minlength="10"></textarea>
+          
+          <button type="submit" class="btn">Send Message</button>
+        </form>
       </div>
-    </article>
-  </section>
+    </section>
 
-  <footer class="footer" role="contentinfo" aria-live="polite">
-    Made with ✨ and a little sci-fi glow.
+    <!-- PREMIUM TAB -->
+    <section id="tabpanel-premium" class="tab-content" role="tabpanel" aria-labelledby="tab-premium" tabindex="0">
+      <div class="premium-container" aria-label="Premium subscription plans">
+        <h3>Unlock Premium Features</h3>
+        <div class="premium-cards">
+          <article class="premium-card" tabindex="0" aria-describedby="basic-desc">
+            <h4>Basic Plan</h4>
+            <ul id="basic-desc">
+              <li>Unlimited chats per day</li>
+              <li>Save chat history locally</li>
+              <li>Basic priority support</li>
+            </ul>
+          </article>
+          <article class="premium-card" tabindex="0" aria-describedby="pro-desc">
+            <h4>Pro Plan</h4>
+            <ul id="pro-desc">
+              <li>All Basic features</li>
+              <li>Cloud chat backup</li>
+              <li>Custom bot personalities</li>
+              <li>Faster response times</li>
+            </ul>
+          </article>
+          <article class="premium-card" tabindex="0" aria-describedby="elite-desc">
+            <h4>Elite Plan</h4>
+            <ul id="elite-desc">
+              <li>All Pro features</li>
+              <li>Dedicated AI support</li>
+              <li>Early access to new features</li>
+              <li>VIP-only community</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS TAB -->
+    <section id="tabpanel-settings" class="tab-content" role="tabpanel" aria-labelledby="tab-settings" tabindex="0">
+      <div class="settings-container" role="form" aria-label="User settings">
+        <h3>Settings</h3>
+        <div class="settings-group">
+          <label for="settingAutoSave">
+            <input type="checkbox" id="settingAutoSave" />
+            Automatically save chat history
+          </label>
+          <label for="settingAnimations">
+            <input type="checkbox" id="settingAnimations" checked disabled />
+            Message animations (always on)
+          </label>
+          <label for="settingDarkMode">
+            <input type="checkbox" id="settingDarkMode" />
+            Enable Dark Mode
+          </label>
+        </div>
+        <div class="settings-buttons">
+          <button id="btnExport" class="btn" aria-label="Export chat history">Export Chat History</button>
+          <button id="btnClear" class="btn" aria-label="Clear chat history">Clear Chat History</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    GlizzyBot © 2025 — Crafted with futuristic vibes by GlizzyGuy09
   </footer>
 </div>
-
 <script>
 (() => {
-  // Elements
-  const messages = document.getElementById('messages');
-  const input = document.getElementById('messageInput');
-  const sendBtn = document.getElementById('sendBtn');
-  const settingsBtn = document.getElementById('settingsBtn');
-  const sidePanel = document.getElementById('sidePanel');
-  const animationsToggle = document.getElementById('animationsToggle');
-  const saveToggle = document.getElementById('saveToggle');
-  const fancyToggle = document.getElementById('fancyToggle');
-  const exportBtn = document.getElementById('exportBtn');
-  const clearBtn = document.getElementById('clearBtn');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const gsiButtonContainer = document.getElementById('gsi-button');
+  'use strict';
 
-  // State
+  // --- DOM references ---
+  const tabs = document.querySelectorAll('.nav-tab');
+  const tabContents = document.querySelectorAll('.tab-content');
+  const currentTabTitle = document.getElementById('current-tab-title');
+
+  // Chat elements
+  const chatMessages = document.getElementById('chatMessages');
+  const chatInput = document.getElementById('chatInput');
+  const btnSend = document.getElementById('btnSend');
+
+  // Contact form
+  const contactForm = document.getElementById('contactForm');
+
+  // Settings controls
+  const settingAutoSave = document.getElementById('settingAutoSave');
+  const settingAnimations = document.getElementById('settingAnimations');
+  const settingDarkMode = document.getElementById('settingDarkMode');
+  const btnExport = document.getElementById('btnExport');
+  const btnClear = document.getElementById('btnClear');
+
+  // Google sign in controls
+  const googleSignInDiv = document.getElementById('googleSignInDiv');
+  const btnLogout = document.getElementById('btnLogout');
+
+  // --- State ---
   let googleUser = null;
   let chatHistory = [];
+  let autoSaveEnabled = false;
+  let animationsEnabled = true; // always true, disabled checkbox
+  let darkModeEnabled = false;
 
-  // Google Sign-In callback
-  function handleCredentialResponse(response) {
-    try {
-      const userObject = jwt_decode(response.credential);
-      googleUser = userObject;
-      showLoggedInUI();
-      loadHistory();
-    } catch (err) {
-      console.error('Error decoding Google credential:', err);
-      googleUser = null;
-    }
-  }
+  // --- Utility functions ---
 
-  // Show/hide UI elements on login/logout
-  function showLoggedInUI() {
-    gsiButtonContainer.classList.add('hidden');
-    logoutBtn.classList.remove('hidden');
-    settingsBtn.classList.remove('hidden');
-    saveToggle.disabled = false;
-  }
-
-  function showLoggedOutUI() {
-    googleUser = null;
-    gsiButtonContainer.classList.remove('hidden');
-    logoutBtn.classList.add('hidden');
-    saveToggle.disabled = true;
-    chatHistory = [];
-    clearMessages();
-  }
-
-  // Clear chat display
-  function clearMessages() {
-    messages.innerHTML = '';
-  }
-
-  // Add message bubble
-  function addMessage(text, fromBot = false) {
-    const msg = document.createElement('div');
-    msg.className = 'message ' + (fromBot ? 'bot' : 'user');
-    msg.textContent = text;
-
-    if (fancyToggle.checked) {
-      msg.style.opacity = '0';
-      msg.style.transform = 'translateY(10px)';
-      messages.appendChild(msg);
-      requestAnimationFrame(() => {
-        msg.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-        msg.style.opacity = '1';
-        msg.style.transform = 'translateY(0)';
-      });
-    } else {
-      messages.appendChild(msg);
-    }
-    messages.scrollTop = messages.scrollHeight;
-  }
-
-  // Save chat history to localStorage if signed in & saving enabled
-  function saveHistory() {
-    if (!googleUser || !saveToggle.checked) return;
+  // Save chat history in localStorage keyed by userId
+  function saveChatHistory() {
+    if (!autoSaveEnabled || !googleUser) return;
     localStorage.setItem('glizzybot_history_' + googleUser.sub, JSON.stringify(chatHistory));
   }
 
   // Load chat history from localStorage
-  function loadHistory() {
-    if (!googleUser || !saveToggle.checked) {
+  function loadChatHistory() {
+    if (!googleUser) return;
+    const data = localStorage.getItem('glizzybot_history_' + googleUser.sub);
+    if (data) {
+      try {
+        chatHistory = JSON.parse(data);
+      } catch {
+        chatHistory = [];
+      }
+    } else {
       chatHistory = [];
-      clearMessages();
+    }
+  }
+
+  // Clear chat messages UI
+  function clearMessages() {
+    chatMessages.innerHTML = '';
+  }
+
+  // Append a message to chat UI with animation if enabled
+  function addMessage(text, fromBot = false) {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('message');
+    msgDiv.classList.add(fromBot ? 'bot' : 'user');
+    msgDiv.textContent = text;
+    if (animationsEnabled) {
+      msgDiv.style.opacity = 0;
+      msgDiv.style.transform = 'translateY(20px)';
+      chatMessages.appendChild(msgDiv);
+      // Trigger animation with delay
+      requestAnimationFrame(() => {
+        msgDiv.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+        msgDiv.style.opacity = '1';
+        msgDiv.style.transform = 'translateY(0)';
+      });
+    } else {
+      chatMessages.appendChild(msgDiv);
+    }
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  // Append messages from history to UI
+  function loadMessagesFromHistory() {
+    clearMessages();
+    for (const msg of chatHistory) {
+      addMessage(msg.text, msg.fromBot);
+    }
+  }
+
+  // Switch active tab UI & update aria attributes
+  function switchTab(tabId) {
+    tabs.forEach(t => {
+      const active = t.id === tabId;
+      t.classList.toggle('active', active);
+      t.setAttribute('aria-selected', active ? 'true' : 'false');
+      t.tabIndex = active ? 0 : -1;
+    });
+    tabContents.forEach(tc => {
+      tc.classList.toggle('active', tc.id === 'tabpanel-' + tabId.slice(4));
+      if (tc.id === 'tabpanel-' + tabId.slice(4)) tc.focus();
+    });
+    currentTabTitle.textContent = tabId.slice(4).charAt(0).toUpperCase() + tabId.slice(5);
+  }
+
+  // Validate contact form fields, returns true if valid, else false and marks invalid fields
+  function validateContactForm() {
+    let valid = true;
+    const nameInput = contactForm.contactName;
+    const emailInput = contactForm.contactEmail;
+    const messageInput = contactForm.contactMessage;
+
+    // Clear previous errors
+    [nameInput, emailInput, messageInput].forEach(i => {
+      i.style.borderColor = '';
+      i.setAttribute('aria-invalid', 'false');
+    });
+
+    if (nameInput.value.trim().length < 2) {
+      valid = false;
+      nameInput.style.borderColor = '#ff5555';
+      nameInput.setAttribute('aria-invalid', 'true');
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(emailInput.value.trim())) {
+      valid = false;
+      emailInput.style.borderColor = '#ff5555';
+      emailInput.setAttribute('aria-invalid', 'true');
+    }
+
+    if (messageInput.value.trim().length < 10) {
+      valid = false;
+      messageInput.style.borderColor = '#ff5555';
+      messageInput.setAttribute('aria-invalid', 'true');
+    }
+
+    return valid;
+  }
+
+  // Handle contact form submit (dummy, no actual email sending)
+  contactForm.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!validateContactForm()) {
+      alert('Please fill out the form correctly.');
       return;
     }
-    const stored = localStorage.getItem('glizzybot_history_' + googleUser.sub);
-    if (stored) {
-      chatHistory = JSON.parse(stored);
-      clearMessages();
-      chatHistory.forEach(msg => addMessage(msg.text, msg.fromBot));
-    }
-  }
+    alert('Thanks for contacting GlizzyBot! We will get back to you soon.');
+    contactForm.reset();
+  });
 
-  // Add message to history and save
-  function appendToHistory(text, fromBot) {
-    chatHistory.push({ text, fromBot });
-    if (chatHistory.length > 100) chatHistory.shift(); // limit history
-    saveHistory();
-  }
+  // --- Chat message sending ---
 
-  // Send message to backend
   async function sendMessage() {
-    const text = input.value.trim();
-    if (!text) return;
-    input.value = '';
-    addMessage(text, false);
-    appendToHistory(text, false);
+    const question = chatInput.value.trim();
+    if (!question) return;
+
+    addMessage(question, false);
+    chatHistory.push({ text: question, fromBot: false });
+    chatInput.value = '';
+    chatInput.disabled = true;
+    btnSend.disabled = true;
 
     try {
-      const res = await fetch('/chat', {
+      // Replace with your backend URL or OpenAI API proxy
+      const response = await fetch('/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: text, user: googleUser ? googleUser.sub : null }),
+        body: JSON.stringify({ prompt: question }),
       });
-      if (!res.ok) throw new Error('Network error');
-      const data = await res.json();
+      if (!response.ok) throw new Error('Network error');
+
+      const data = await response.json();
       if (data.error) {
         addMessage('Error: ' + data.error, true);
-        appendToHistory('Error: ' + data.error, true);
+        chatHistory.push({ text: 'Error: ' + data.error, fromBot: true });
       } else {
         addMessage(data.response, true);
-        appendToHistory(data.response, true);
+        chatHistory.push({ text: data.response, fromBot: true });
       }
     } catch (err) {
       addMessage('Failed to connect to the server.', true);
-      appendToHistory('Failed to connect to the server.', true);
+      chatHistory.push({ text: 'Failed to connect to the server.', fromBot: true });
     }
+
+    chatInput.disabled = false;
+    btnSend.disabled = false;
+    saveChatHistory();
   }
 
-  // Toggle side panel
-  function toggleSettings() {
-    const hidden = sidePanel.classList.toggle('hidden');
-    sidePanel.setAttribute('aria-hidden', hidden ? 'true' : 'false');
-  }
+  btnSend.addEventListener('click', sendMessage);
+  chatInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
 
-  // Export chat history as text file
-  function exportHistory() {
+  // --- Tabs switching ---
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => switchTab(tab.id));
+    tab.addEventListener('keydown', e => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        let next = tab.nextElementSibling || tabs[0];
+        next.focus();
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        let prev = tab.previousElementSibling || tabs[tabs.length - 1];
+        prev.focus();
+      }
+    });
+  });
+
+  // --- Settings controls ---
+
+  settingAutoSave.addEventListener('change', e => {
+    autoSaveEnabled = e.target.checked;
+    if (autoSaveEnabled) saveChatHistory();
+  });
+
+  settingDarkMode.addEventListener('change', e => {
+    darkModeEnabled = e.target.checked;
+    document.body.classList.toggle('dark-mode', darkModeEnabled);
+  });
+
+  btnExport.addEventListener('click', () => {
     if (chatHistory.length === 0) return alert('No chat history to export.');
     let exportText = chatHistory
       .map(msg => (msg.fromBot ? 'GlizzyBot: ' : 'You: ') + msg.text)
@@ -596,53 +1090,134 @@ button.send:active {
     a.download = 'glizzybot_chat_history.txt';
     a.click();
     URL.revokeObjectURL(url);
-  }
+  });
 
-  // Clear chat history both UI and storage
-  function clearHistory() {
+  btnClear.addEventListener('click', () => {
     if (!confirm('Clear chat history? This cannot be undone.')) return;
     chatHistory = [];
     clearMessages();
     if (googleUser) localStorage.removeItem('glizzybot_history_' + googleUser.sub);
-  }
-
-  // Log out Google user
-  function logout() {
-    google.accounts.id.disableAutoSelect();
-    googleUser = null;
-    showLoggedOutUI();
-  }
-
-  // Event listeners
-  sendBtn.addEventListener('click', sendMessage);
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
   });
-  settingsBtn.addEventListener('click', toggleSettings);
-  exportBtn.addEventListener('click', exportHistory);
-  clearBtn.addEventListener('click', clearHistory);
-  logoutBtn.addEventListener('click', logout);
 
-  // Google Identity API Init
+  // --- Google Sign-In handling ---
+
+  function showLoggedInUI() {
+    googleSignInDiv.style.display = 'none';
+    btnLogout.hidden = false;
+    settingAutoSave.disabled = false;
+    loadChatHistory();
+    loadMessagesFromHistory();
+  }
+
+  function showLoggedOutUI() {
+    googleSignInDiv.style.display = 'block';
+    btnLogout.hidden = true;
+    settingAutoSave.disabled = true;
+    chatHistory = [];
+    clearMessages();
+  }
+
+  function handleCredentialResponse(response) {
+    if (!response.credential) return;
+    try {
+      const user = jwt_decode(response.credential);
+      googleUser = user;
+      showLoggedInUI();
+    } catch (e) {
+      console.error('Google credential decode error:', e);
+    }
+  }
+
   window.onload = () => {
+    // Initialize Google Sign-In button
     google.accounts.id.initialize({
       client_id: '472534217982-bjn2mbaq2t1f1s8jenqh6t389u595kcf.apps.googleusercontent.com',
       callback: handleCredentialResponse,
       auto_select: false,
-      cancel_on_tap_outside: false,
+      cancel_on_tap_outside: true,
     });
     google.accounts.id.renderButton(
-      gsiButtonContainer,
-      { theme: 'outline', size: 'large', width: 200 }
+      googleSignInDiv,
+      { theme: 'outline', size: 'medium', width: 180 }
     );
     google.accounts.id.prompt();
 
-    // Disable save toggle if not logged in
-    saveToggle.disabled = true;
+    // Start with Chat tab
+    switchTab('tab-chat');
   };
+
+  btnLogout.addEventListener('click', () => {
+    google.accounts.id.disableAutoSelect();
+    googleUser = null;
+    showLoggedOutUI();
+  });
+
+  // --- Dark mode CSS toggle ---
+  const darkModeStyles = `
+    body.dark-mode {
+      background: linear-gradient(135deg, #000814, #001022);
+      color: #a0c8ffdd;
+    }
+    body.dark-mode .page {
+      background: #000a1e;
+      box-shadow:
+        0 0 40px #0033ffcc inset;
+    }
+    body.dark-mode .sidebar {
+      background: #000a1f;
+      border-color: #0055ffcc;
+      box-shadow: inset -3px 0 20px #0066ff66;
+    }
+    body.dark-mode .nav-tab.active {
+      background: #0077ffcc;
+      border-color: #99ccffdd;
+      box-shadow: 0 0 40px #55bbffdd inset;
+    }
+    body.dark-mode .header {
+      background: #000e2e;
+      border-color: #0055ffcc;
+      box-shadow: 0 2px 22px #0044ffcc inset;
+    }
+    body.dark-mode .footer {
+      background: #000d24;
+      border-color: #0044ffcc;
+      box-shadow: inset 0 1px 10px #0033ccdd;
+    }
+    body.dark-mode .messages {
+      background: #001533;
+      color: #a4c8ffdd;
+      box-shadow: inset 0 0 22px #0055ffcc;
+    }
+    body.dark-mode .message.bot {
+      background: linear-gradient(135deg, #003366, #004d99);
+      color: #bbdfffcc;
+      box-shadow: 0 0 22px #3399ffdd inset;
+    }
+    body.dark-mode .message.user {
+      background: linear-gradient(135deg, #004dbb, #3366ff);
+      color: #d1e7ffcc;
+      box-shadow: 0 0 24px #55aaffcc inset;
+    }
+    body.dark-mode #chatInput {
+      background: #002050;
+      color: #bbdfffcc;
+      box-shadow: inset 0 0 18px #0055ffcc;
+    }
+    body.dark-mode .btn-send {
+      background: linear-gradient(135deg, #3366ff, #2244cc);
+      box-shadow: 0 0 36px #4477ffcc;
+    }
+    body.dark-mode .btn-send:hover {
+      background: linear-gradient(135deg, #5599ff, #3366ff);
+      box-shadow: 0 0 48px #66bbffdd;
+    }
+  `;
+
+  // Inject dark mode styles on toggle
+  const styleSheet = document.createElement('style');
+  styleSheet.textContent = darkModeStyles;
+  document.head.appendChild(styleSheet);
+
 })();
 </script>
 </body>
