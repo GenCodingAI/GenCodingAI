@@ -1,37 +1,10 @@
-<head>
+ <head>
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png">
 
   <!-- Google Sign-In -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
-
-  <script>
-    const GOOGLE_CLIENT_ID = "472534217982-r7rmrlueav1r14snjvjl9j7bn7hb8nst.apps.googleusercontent.com";
-
-    function handleCredentialResponse(response) {
-      const data = jwt_decode(response.credential);
-      console.log("User data:", data);
-    }
-
-    window.onload = function () {
-      google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleCredentialResponse
-      });
-
-      google.accounts.id.renderButton(
-        document.getElementById("googleSignInDiv"),
-        { theme: "outline", size: "large" }
-      );
-
-      google.accounts.id.prompt();
-    };
-  </script>
-</head>
-<body>
-  <div id="googleSignInDiv"></div>
-</body>
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>   , auth2 client I'd - 472534217982-uhkr8o2p96gklv54c9u8p1j3qkhgitgg.apps.googleusercontent.com browser API key - AIzaSyDsWqMO9cbFeHrLMVhYiPrIqpfk-5aeCT8
 
 <style>
 /* ===== Reset ===== */
