@@ -1,13 +1,43 @@
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GenCoding - The Best AI Computer Programming Experience</title>
-  <meta name="google-site-verification" content="wnmHz1u7I5ExKiKCmM_K6EgDmRfAqzmIWWrf0TCvdB0" />
-</head>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png">
 
-<!-- Google Sign-In -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+  <!-- Google Sign-In -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+
+  <script>
+    // Your Google OAuth 2.0 Client ID
+    const GOOGLE_CLIENT_ID = "472534217982-uhkr8o2p96gklv54c9u8p1j3qkhgitgg.apps.googleusercontent.com";
+
+    // Your Browser API Key (if needed for certain APIs)
+    const GOOGLE_API_KEY = "AIzaSyDsWqMO9cbFeHrLMVhYiPrIqpfk-5aeCT8";
+
+    function handleCredentialResponse(response) {
+      const data = jwt_decode(response.credential);
+      console.log("User data:", data);
+      // Here you can send 'data' to your backend or Firebase
+    }
+
+    window.onload = function () {
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleCredentialResponse
+      });
+
+      google.accounts.id.renderButton(
+        document.getElementById("googleSignInDiv"),
+        { theme: "outline", size: "large" }
+      );
+
+      google.accounts.id.prompt(); // Shows the One Tap prompt
+    };
+  </script>
+</head>
+<body>
+  <!-- Google Sign-In button container -->
+  <div id="googleSignInDiv"></div>
+</body>
 
 <style>
 /* ===== Reset ===== */
@@ -1222,3 +1252,9 @@ html, body {
 </script>
 </body>
 </html>
+>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GenCoding - The Best AI Computer Programming Experience</title>
+  <meta name="google-site-verification" content="wnmHz1u7I5ExKiKCmM_K6EgDmRfAqzmIWWrf0TCvdB0" />
+</head>
