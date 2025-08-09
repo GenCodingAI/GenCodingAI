@@ -7,16 +7,11 @@
   <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
 
   <script>
-    // Your Google OAuth 2.0 Client ID
     const GOOGLE_CLIENT_ID = "472534217982-uhkr8o2p96gklv54c9u8p1j3qkhgitgg.apps.googleusercontent.com";
-
-    // Your Browser API Key (if needed for certain APIs)
-    const GOOGLE_API_KEY = "AIzaSyDsWqMO9cbFeHrLMVhYiPrIqpfk-5aeCT8";
 
     function handleCredentialResponse(response) {
       const data = jwt_decode(response.credential);
       console.log("User data:", data);
-      // Here you can send 'data' to your backend or Firebase
     }
 
     window.onload = function () {
@@ -30,12 +25,11 @@
         { theme: "outline", size: "large" }
       );
 
-      google.accounts.id.prompt(); // Shows the One Tap prompt
+      google.accounts.id.prompt();
     };
   </script>
 </head>
 <body>
-  <!-- Google Sign-In button container -->
   <div id="googleSignInDiv"></div>
 </body>
 
