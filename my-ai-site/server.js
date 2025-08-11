@@ -1,5 +1,5 @@
-// server.js
-// Node/Express backend — verifies Google ID token, uses OpenAI key from .env, saves user history to /data
+import dotenv from 'dotenv';
+dotenv.config();
 
 require('dotenv').config();
 const express = require('express');
